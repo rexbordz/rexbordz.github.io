@@ -1,0 +1,211 @@
+{
+  "sections": [
+    {
+      "title": "Simulation",
+      "fields": [
+        {
+          "id": "sim",
+          "label": "Simulation Mode",
+          "note": "For testing purposes",
+          "type": "checkbox",
+          "defaultValue": false
+        }
+      ]
+    },
+    {
+      "title": "Core Configuration",
+      "fields": [
+        {
+          "id": "font",
+          "label": "Font",
+          "type": "font",
+          "defaultValue": "",
+          "placeholder": "Figtree",
+          "bundledFonts": [
+            {
+              "name": "Figtree",
+              "css": "https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap"
+            },
+            {
+              "name": "TikTok Sans",
+              "css": "https://fonts.googleapis.com/css2?family=TikTok+Sans:opsz,wght@12..36,300..900&display=swap"
+            }
+          ]
+        },
+        {
+          "id": "fontSize",
+          "label": "Font Size (px)",
+          "type": "number",
+          "defaultValue": "",
+          "placeholder": 18
+        },
+        {
+          "id": "duration",
+          "label": "Duration",
+          "note": "How long the message stays in seconds. 0 = forever",
+          "type": "number",
+          "defaultValue": "",
+          "placeholder": 0
+        },
+        {
+          "id": "direction",
+          "label": "Chat Direcion",
+          "note": "Determines how the initial chats will render. The latest chat will be appended to the bottom no matter what you choose. You're just choosing where the first few chats will render from.",
+          "type": "select",
+          "defaultValue": "bottom",
+          "options": [
+            { "label": "Bottom-up", "value": "bottom" },
+            { "label": "Top-down", "value": "top" }
+          ]
+        },
+        {
+          "id": "showPlatform",
+          "label": "Platform Icon",
+          "note": "Show platform icons",
+          "type": "checkbox",
+          "defaultValue": true
+        },
+        {
+          "id": "showBadges",
+          "label": "Badges",
+          "note": "Show User Badges",
+          "type": "checkbox",
+          "defaultValue": true
+        },
+        {
+          "id": "showTheirAvatar",
+          "label": "Left Side Avatar",
+          "note": "Display the avatar of the left-side chat (others)",
+          "type": "checkbox",
+          "defaultValue": true
+        },
+        {
+          "id": "showMyAvatar",
+          "label": "Right Side Avatar",
+          "note": "Display the avatar of the right-side chat (yours)",
+          "type": "checkbox",
+          "defaultValue": true
+        },
+        {
+          "id": "otherBubbleColor",
+          "label": "Left Bubble Color",
+          "note": "Background color of left-side chats",
+          "type": "color-rgba",
+          "defaultValue": "rgba(51,51,53,0.92)"
+        },
+        {
+          "id": "myBubbleColor",
+          "label": "Right Bubble Color",
+          "note": "Background color of right-side chats",
+          "type": "color-rgba",
+          "defaultValue": "rgba(0,106,255,0.92)"
+        },
+        {
+          "id": "botBubbleColor",
+          "label": "Bot Bubble Color",
+          "note": "Background color of the chat coming from users defined in Bots",
+          "type": "color-rgba",
+          "defaultValue": "rgba(83,60,224,0.92)"
+        },
+        {
+          "id": "bots",
+          "label": "Bots",
+          "note": "Chats from these users will be treated as \"yours\" (right side). Recommended to put your bots in this field but you can put whoever you want. Separate by comma and case-insensitive",
+          "type": "text",
+          "defaultValue": "streamelements,nightbot,fossabot,streamlabs",
+          "omitWhenDefault": false
+        },
+        {
+          "id": "ignore",
+          "label": "Ignore Users",
+          "note": "Usernames whose chats will never be rendered. Separate by comma and case-insensitive",
+          "type": "text",
+          "defaultValue": ""
+        },
+        {
+          "id": "excludeCommands",
+          "label": "Exclude Commands",
+          "note": "Hide messages that start with \"!\" (chat commands)",
+          "type": "checkbox",
+          "defaultValue": true
+        }
+      ]
+    },
+    {
+      "title": "Twitch",
+      "fields": [
+        {
+          "id": "showTwitchChat",
+          "label": "Chat",
+          "type": "checkbox",
+          "defaultValue": true
+        },
+        {
+          "id": "showTwitchAnnounce",
+          "label": "Announcement",
+          "type": "checkbox",
+          "defaultValue": true
+        }
+      ]
+    },
+    {
+      "title": "YouTube",
+      "fields": [
+        {
+          "id": "showYoutubeChat",
+          "label": "Chat",
+          "type": "checkbox",
+          "defaultValue": true
+        }
+      ]
+    },
+    {
+      "title": "Kick",
+      "fields": [
+        {
+          "id": "showKickChat",
+          "label": "Chat",
+          "type": "checkbox",
+          "defaultValue": true
+        }
+      ]
+    },
+    {
+      "title": "TikTok",
+      "fields": [
+        {
+          "id": "showTikTokChat",
+          "label": "Chat",
+          "type": "checkbox",
+          "defaultValue": true
+        },
+        {
+          "id": "fansClub",
+          "label": "Fans Club Text",
+          "note": "Tikfinity doesn't provide your fan badge text in the payload so we need to manually set it here.",
+          "type": "text",
+          "defaultValue": ""
+        }
+      ]
+    },
+    {
+      "title": "Streamer.bot",
+      "fields": [
+        {
+          "id": "address",
+          "label": "WebSocket Address",
+          "type": "text",
+          "defaultValue": "",
+          "placeholder": "127.0.0.1"
+        },
+        {
+          "id": "port",
+          "label": "WebSocket Port",
+          "type": "number",
+          "defaultValue": "",
+          "placeholder": 8080
+        }
+      ]
+    }
+  ]
+}

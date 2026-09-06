@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="../assets/images/favicon.ico">
+  <title>Settings Core Playground</title>
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: #111;
+    }
+
+    #settingsCoreFrame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <iframe id="settingsCoreFrame" title="Settings" allow="local-fonts"></iframe>
+
+  <script>
+    (function () {
+      const frame = document.getElementById('settingsCoreFrame');
+      const currentDir = window.location.href.replace(/index\.html(?:\?.*)?$/, '');
+      const rootDir = currentDir.replace(/settings\/$/, '');
+
+      const bootConfig = {
+        configUrl: currentDir + 'settings.json',
+        hooksUrl: currentDir + 'settings.js',
+        widgetUrl: currentDir + 'preview.html',
+        page: {
+          widgetTitle: 'Settings Playground',
+          storageKey: 'settings-core-playground',
+          // Prefills Width/Height in the "Add New Source to OBS" modal.
+          sourceWidth: 800,
+          sourceHeight: 600,
+          testButtons: [
+            { label: 'Test Alert', value: 'default' }
+          ]
+        }
+      };
+
+      const sessionKey = 'settings-core:' + window.location.pathname;
+      sessionStorage.setItem(sessionKey, JSON.stringify(bootConfig));
+      frame.src = rootDir + 'core/settings/index.html?sessionKey=' + encodeURIComponent(sessionKey);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,478 @@
+/* ============================================================================
+   Multistream chat overlay — layout & motion
+   Every metric derives from --font-size (set by scripts/render.js from the
+   `fontSize` setting), so changing one number rescales the whole overlay.
+   `font` (the `font` setting) sets --font-family instead.
+   ========================================================================== */
+
+:root {
+  --font-size: 15px;            /* message text size — the scale root */
+  --font-family: Figtree, system-ui, -apple-system, sans-serif;
+  --u: calc(var(--font-size) / 15);  /* unitless-ish multiplier for derived sizes */
+
+  --r-lg: calc(var(--font-size) * 1.333);   /* outer pill corner */
+  --r-md: calc(var(--font-size) * 1.333);     /* far-side corner inside a grouped run */
+  --r-sm: calc(var(--font-size) * 0.3);   /* corner between grouped pills */
+  --chip: calc(var(--font-size) * 1.067);   /* platform logo / badge height */
+  --avatar: calc(var(--font-size) * 2.133);
+  --gap: calc(var(--font-size) * 0.533);
+  --row-gap: calc(var(--font-size) * 0.35);   /* between different senders */
+  --pill-gap: calc(var(--font-size) * 0.1);  /* between a sender's own pills */
+  --head-gap: 3.5px; /* between platform, badges and name */
+  --badge-gap: 3.5px;/* between one badge and the next */
+  --pad-x: calc(var(--font-size) * 1.2);
+  --pad-y: calc(var(--font-size) * 1.067);
+  --feather: calc(var(--font-size) * 1.8);    /* top fade depth — one text line, no more */
+
+  /* --dur-in / --dur-out are published by applyVars() in scripts/render.js, so the
+     corner morph always runs for exactly as long as the fade that triggered it. */
+  --ease-morph: cubic-bezier(.4, 0, .6, 1);   /* EASE_OUT in render.js */
+
+  --shadow-pill: 0 calc(var(--font-size) * 0.1) calc(var(--font-size) * 0.27) rgba(0, 0, 0, 0.28);
+  --shadow-avatar: 0 calc(var(--font-size) * 0.13) calc(var(--font-size) * 0.33) rgba(0, 0, 0, 0.42);
+  --shadow-text: calc(var(--font-size) * 0.05) calc(var(--font-size) * 0.07) calc(var(--font-size) * 0.15) rgba(0, 0, 0, 0.9);
+
+  --other-bubble: rgba(44, 47, 60, 0.92);
+  --my-bubble: #533ce0;
+  --bot-bubble: #3c4a63;
+  --max-bubble: 78%;            /* bubble width cap, relative to overlay width */
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: transparent;      /* OBS / browser-source stays see-through */
+  overflow: hidden;
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------------- container */
+
+.chat {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 0 var(--pad-x) var(--pad-y);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;    /* newest sits on the bottom edge */
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.chat[data-dir="top"] { justify-content: flex-start; }
+
+/* Top fade — only while content actually overflows, so a lone first
+   message in top mode is never clipped. */
+.chat.is-feathered {
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 var(--feather));
+  mask-image: linear-gradient(180deg, transparent 0, #000 var(--feather));
+}
+
+/* -------------------------------------------------------------------- group */
+
+.group {
+  display: flex;
+  align-items: flex-end;        /* avatar sticks to the bottom of the group */
+  gap: var(--gap);
+  width: 100%;
+  margin-top: var(--row-gap);
+}
+
+.group[data-side="right"] { flex-direction: row-reverse; }
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--pill-gap);
+  flex: 1;
+  min-width: 0;
+}
+
+.group[data-side="right"] .stack { align-items: flex-end; }
+
+/* -------------------------------------------------------------- user header */
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--head-gap);
+  max-width: 100%;
+  padding: 0 calc(var(--font-size) * 0.667) calc(var(--font-size) * 0.08);
+  text-shadow: var(--shadow-text);
+}
+
+.head[hidden] { display: none; }
+
+.name {
+  font-weight: 700;
+  font-size: calc(var(--font-size) * 0.833);
+  color: #dfe3ee;
+  white-space: nowrap;
+  overflow: clip;
+  /* The `padding-box` keyword is load-bearing: Chromium drops
+     overflow-clip-margin when the value is a bare calc(), silently clipping
+     flush to the box. With the visual-box keyword the same calc() applies. */
+  overflow-clip-margin: padding-box calc(var(--font-size) * 0.4);   /* room for the text shadow */
+}
+
+.platform,
+.badge,
+.avatar {
+  background-repeat: no-repeat;
+  background-position: center;
+  flex: none;
+}
+
+/* platform logo — bundled <img>, letter mark on a colored chip as fallback */
+.platform {
+  width: var(--chip);
+  height: var(--chip);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 800 calc(var(--font-size) * 0.533) / 1 ui-monospace, monospace;
+  overflow: hidden;
+}
+.platform[hidden] { display: none; }
+
+.platform-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* YouTube's mark is wider than tall, so `contain` leaves vertical padding inside
+   the square chip and it reads smaller than the others — scale it up to compensate. */
+.platform[data-platform="youtube"] {
+  overflow: visible;
+}
+.platform[data-platform="youtube"] .platform-logo {
+  transform: scale(1.15);
+}
+/* the vertical/shorts mark is already square, so it doesn't need the compensation scale above */
+.platform[data-platform="youtube"] .platform-logo[src*="logo-youtube-vertical"] {
+  transform: scale(1);
+}
+
+/* Kick/TikTok's PNGs are full-bleed app icons (mark + rounded background baked in),
+   unlike the padded logomark SVGs — shrink them so they don't sit flush against the chip's own edges. */
+/* .platform[data-platform="kick"] .platform-logo,
+.platform[data-platform="tiktok"] .platform-logo {
+  transform: scale(0.9);
+} */
+
+.badges {
+  display: flex;
+  align-items: center;
+  flex: none;
+  gap: var(--badge-gap);
+}
+
+.badges[hidden] { display: none; }
+
+/* Badges are bare icons — art only, no container. Whatever a platform wants drawn
+   around its badge (background, corners, borders) is baked into its own artwork,
+   so there is nothing for us to style here beyond the box the art fits into. */
+.badge {
+  width: var(--chip);
+  height: var(--chip);
+  background-size: contain;
+}
+
+/* TikTok's badges are finished, self-styled elements from TikTok.createBadges
+   (widget-core/utils/tiktok.js): they bring their own colors, borders, TikTok Sans
+   and every proportion, so none of the .badge rules above apply to them and there is
+   no badge design to restate here.
+
+   All they take from us is a scale. font-size is it — the pill, icon, padding,
+   corners and borders are all multiples of it, so this one line sizes the whole
+   badge. 0.65 is the same multiplier .badge uses for the other platforms, which is
+   what lands TikTok's pills on --chip and its labels at the size of theirs.
+
+   Want them bigger or smaller? Change 0.65, nothing else. */
+.badges[data-platform="tiktok"] {
+  font-size: calc(var(--font-size) * 0.65);
+}
+
+.avatar {
+  width: var(--avatar);
+  height: var(--avatar);
+  border-radius: 50%;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  overflow: hidden;
+  font: 700 calc(var(--font-size) * 0.867) / 1 var(--font-family);
+  box-shadow: var(--shadow-avatar);
+}
+
+.avatar[hidden] { display: none; }
+
+/* inline emote images inside message text / reply quotes */
+.bubble img,
+.reply-quote img {
+  height: calc(var(--font-size) * 1.4);
+  width: auto;
+  vertical-align: -0.28em;
+  margin: 0 0.06em;
+}
+
+/* ------------------------------------------------------------------ bubbles */
+
+/* .wrap is a 1fr grid row: animating it 0fr -> 1fr grows the stack from the
+   bottom (or top) edge and pushes everything else, like a native chat app. */
+.wrap {
+  display: grid;
+  grid-template-rows: 1fr;
+  width: 100%;
+}
+
+.wrap-inner {
+  /* `clip` + clip-margin instead of `hidden`: the row still collapses to 0fr for
+     the grow animation, but shadows are allowed to paint past the clip box. */
+  overflow: clip;
+  overflow-clip-margin: padding-box calc(var(--font-size) * 0.8);   /* keyword required — see .name */
+  min-height: 0;
+  min-width: 0;      /* the nowrap reply quote must not widen the row — see .reply-quote */
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.group[data-side="right"] .wrap-inner { align-items: flex-end; }
+
+/* CSS sizes this box from the text laid out on a single line and then clamps
+   that to the cap, so a wrapped message keeps the whole cap width and trails
+   dead space past its shortest line — fit-content, inline-block and table all
+   land on the same clamp. render.js re-measures the drawn line boxes and pins
+   an exact width; the cap still governs where the text breaks. */
+.bubble {
+  max-width: var(--max-bubble);
+  padding: calc(var(--font-size) * 0.6) calc(var(--font-size) * 0.933);
+  font-weight: 500;
+  font-size: var(--font-size);
+  line-height: 1.32;
+  word-break: break-word;
+  background: var(--other-bubble);
+  color: #fff;
+  box-shadow: var(--shadow-pill);
+  /* default: a lone pill, fully rounded — the rules below tighten a corner only
+     where a live neighbour sits against it */
+  border-radius: var(--r-lg);
+  transition: border-radius var(--morph, var(--dur-in, 300ms)) var(--ease-morph);
+}
+
+/* a run losing a pill reshapes at the collapse's pace, not the pop's */
+.stack.is-removing { --morph: var(--dur-out, 360ms); }
+
+/* Grouped runs merge into one rounded rectangle on the sender's side. Stated as
+   "tighten where a neighbour is" rather than "round off the ends", because only
+   this direction can ignore a pill on its way out: :not(.is-leaving) sits on the
+   neighbour, never on the subject, so a collapsing pill keeps the shape it had
+   while the pills around it morph in step with its fade (see animateOut). */
+.group[data-side="left"]  .wrap:not(.is-leaving) ~ .wrap .bubble { border-top-left-radius:  var(--r-sm); }
+.group[data-side="right"] .wrap:not(.is-leaving) ~ .wrap .bubble { border-top-right-radius: var(--r-sm); }
+
+.group[data-side="left"]  .wrap:has(~ .wrap:not(.is-leaving)) .bubble { border-bottom-left-radius:  var(--r-sm); }
+.group[data-side="right"] .wrap:has(~ .wrap:not(.is-leaving)) .bubble { border-bottom-right-radius: var(--r-sm); }
+
+/* a grouped run reads as one slab: the far-side corners tighten slightly.
+   Both halves must name their side — unqualified, the left rule also matches
+   right-side groups, where top/bottom-right is the sender edge that has to
+   stay tight, and it outranks .group[data-side="right"] .bubble on source
+   order at equal specificity. */
+.group[data-side="left"] .stack:has(.wrap:not(.is-leaving) ~ .wrap:not(.is-leaving)) .bubble {
+  border-top-right-radius: var(--r-md);
+  border-bottom-right-radius: var(--r-md);
+}
+.group[data-side="right"] .stack:has(.wrap:not(.is-leaving) ~ .wrap:not(.is-leaving)) .bubble {
+  border-top-left-radius: var(--r-md);
+  border-bottom-left-radius: var(--r-md);
+}
+
+/* -------------------------------------------------------------------- reply */
+
+.reply {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  min-width: 0;
+}
+
+.group[data-side="right"] .reply { align-items: flex-end; }
+
+/* on a reply the user info lives inline on the "replied to" line */
+.reply-line {
+  display: flex;
+  align-items: center;
+  gap: var(--head-gap);
+  max-width: 100%;
+  min-width: 0;
+  padding: calc(var(--font-size) * 0.133) calc(var(--font-size) * 0.667) calc(var(--font-size) * 0.333);
+  font-size: calc(var(--font-size) * 0.8);
+  color: rgba(255, 255, 255, 0.5);
+  text-shadow: var(--shadow-text);
+}
+
+.reply-from {
+  font-weight: 700;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: clip;
+  overflow-clip-margin: padding-box calc(var(--font-size) * 0.4);
+}
+
+.reply-verb { white-space: nowrap; }
+
+.reply-to {
+  font-weight: 600;
+  min-width: 0;
+  color: rgba(255, 255, 255, 0.68);
+  white-space: nowrap;
+  overflow: clip;
+  overflow-clip-margin: padding-box calc(var(--font-size) * 0.4);   /* room for the text shadow */
+  text-overflow: ellipsis;
+}
+
+.reply-quote {
+  max-width: 72%;
+  padding: calc(var(--font-size) * 0.6) calc(var(--font-size) * 0.933) calc(var(--font-size) * 1.067);
+  margin-bottom: calc(var(--font-size) * -0.667);   /* tucks under the live bubble */
+  border-radius: calc(var(--font-size) * 1.067);
+  background: rgba(0, 0, 0, 0.8);
+  box-shadow: var(--shadow-pill);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: calc(var(--font-size) * 0.9);
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: clip;
+  overflow-clip-margin: padding-box calc(var(--font-size) * 0.8);   /* room for the box shadow */
+  text-overflow: ellipsis;
+}
+
+/* Motion lives in scripts/render.js (Web Animations API) so each message animates
+   exactly once, keyed to its id rather than to a DOM node. The one exception is
+   .bubble's border-radius: a pill's corners answer to its neighbours, not to its own
+   arrival, so that morph is a CSS transition timed off --dur-in / --dur-out. */
+
+
+/* Toast notifications */
+
+.notifications {
+  position: fixed;
+  bottom: 40px;       /* distance from bottom of screen */
+  left: 50%;           /* center horizontally */
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;          /* space between multiple toasts */
+}
+
+.toast {
+  position: relative;
+  padding: 10px;
+  color: #fff;
+  margin-bottom: 10px;
+  max-width: 500px;
+  display: grid;
+  grid-template-columns: 70px 1fr 70px;
+  border-radius: 5px;
+  --color: #0abf30;
+  background: #202022;
+  animation: show 0.3s ease 1 forwards;
+}
+
+
+.toast i{
+  color: var(--color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: x-large;
+}
+
+.toast .content {
+  text-align: left;       
+  display: flex;          
+  flex-direction: column; 
+  justify-content: center; 
+  align-items: flex-start; 
+}
+
+.toast .title{
+  font-size: x-large;
+  font-weight: bold;
+}
+
+.toast span, .toast i:nth-child(3){
+  color: #fff;
+  opacity: 0.6;
+}
+
+@keyframes show {
+  0% {
+    transform: translateY(100%);
+  }
+  40% {
+    transform: translateY(-5%);
+  }
+  80% {
+    transform: translateY(0%);
+  }
+  100% {
+    transform: translateY(-10%);
+  }
+}
+
+
+.toast::before{
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background-color: var(--color);
+  width: 100%;
+  height: 3px;
+  content: '';
+  box-shadow: 0 0 10px var(--color);
+  animation: timeOut 3s linear 1 forwards
+}
+
+@keyframes timeOut{
+  100%{
+      width: 0;
+  }
+}
+
+.toast.error{
+  --color: #f24d4c;
+  background: #202022;
+}
+
+.toast.warning{
+  --color: #e9bd0c;
+  background: #202022;
+}
+
+.toast.info{
+  --color: #3498db;
+  background: #202022;
+}
+
+.toast-logo {
+width: 28px;   /* adjust */
+height: 28px;
+object-fit: contain;
+display: block;
+margin: auto;
+}

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Multistream Chat Overlay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=TikTok+Sans:opsz,wght@12..36,300..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+<script src="https://cdn.jsdelivr.net/npm/@streamerbot/client/dist/streamerbot-client.min.js"></script>
+</head>
+<body>
+
+<div class="notifications"></div>
+<!-- The only live node. Everything inside is created from the templates below. -->
+<div id="chat" class="chat" data-dir="bottom"></div>
+
+<template id="tpl-group">
+  <div class="group">
+    <div class="avatar" hidden></div>
+    <div class="stack">
+      <div class="head" hidden>
+        <span class="platform"></span>
+        <span class="badges"></span>
+        <span class="name"></span>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-bubble">
+  <div class="wrap">
+    <div class="wrap-inner">
+      <div class="bubble"></div>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-reply">
+  <div class="reply">
+    <div class="reply-line">
+      <span class="platform"></span>
+      <span class="badges"></span>
+      <span class="reply-from"></span>
+      <span class="reply-verb">replied to</span>
+      <span class="reply-to"></span>
+    </div>
+    <div class="reply-quote"></div>
+  </div>
+</template>
+
+<template id="tpl-badge">
+  <span class="badge"></span>
+</template>
+
+<script src="../.shared/utils/tiktok.js"></script>
+<script src="../.shared/utils/helpers.js"></script>
+<script src="scripts/connections.js"></script>
+<script src="scripts/handlers.js"></script>
+<script src="scripts/render.js"></script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="../../.shared/assets/images/favicon.ico">
+  <title>Group Chat Overlay Settings</title>
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: #111;
+    }
+
+    #settingsCoreFrame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <!-- allow="local-fonts": the Custom Font picker calls queryLocalFonts().
+       The permission defaults to `self` and both documents are same-origin,
+       so this is only belt-and-braces — but it keeps working if the core is
+       ever served from another origin. -->
+  <iframe id="settingsCoreFrame" title="Settings" allow="local-fonts"></iframe>
+
+  <script>
+    (function () {
+
+      const CORE_BASE = '../../.shared/core/settings/';
+
+      const frame = document.getElementById('settingsCoreFrame');
+      const currentDir = new URL('./', window.location.href).href;
+      const rootDir = currentDir.replace(/settings\/$/, '');
+
+      const bootConfig = {
+        configUrl: currentDir + 'settings.json',
+        widgetUrl: rootDir,
+        page: {
+          widgetTitle: 'Group Chat',
+          storageKey: 'gc-overlay-settings',
+          sourceWidth: 500,   // prefills Width in the Add-Source modal
+          sourceHeight: 600,   // prefills Height
+        },
+      };
+
+      frame.src = CORE_BASE + 'index.html#boot=' + encodeURIComponent(JSON.stringify(bootConfig));
+    })();
+  </script>
+</body>
+</html>

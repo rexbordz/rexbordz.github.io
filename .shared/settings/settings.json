@@ -1,0 +1,69 @@
+{
+  "sections": [
+    {
+      "title": "Appearance",
+      "note": "A grab bag of field types so the settings-core UI can be eyeballed without a real widget.",
+      "fields": [
+        {
+          "id": "font",
+          "label": "Custom Font",
+          "type": "font",
+          "defaultValue": "",
+          "placeholder": "Inter",
+          "note": "Type-or-pick combobox over the fonts installed on this machine.",
+          "bundledFonts": [
+            {
+              "name": "Inter",
+              "css": "https://rsms.me/inter/inter.css"
+            }
+          ]
+        },
+        { "id": "fontSize", "label": "Font Size (px)", "type": "number", "defaultValue": 28, "min": 10, "max": 96 },
+        { "id": "accentColor", "label": "Accent Color", "type": "color-hex", "defaultValue": "#3b82f6" },
+        { "id": "glowColor", "label": "Glow Color (RGBA)", "type": "color-rgba", "defaultValue": "rgba(59, 130, 246, 0.6)" },
+        {
+          "id": "alignment",
+          "label": "Alignment",
+          "type": "select",
+          "defaultValue": "center",
+          "options": [
+            { "label": "Left", "value": "left" },
+            { "label": "Center", "value": "center" },
+            { "label": "Right", "value": "right" }
+          ]
+        },
+        {
+          "id": "soundEnabled",
+          "label": "Enable Sound",
+          "type": "checkbox",
+          "defaultValue": true,
+          "note": "Toggles are rendered as pill switches."
+        }
+      ]
+    },
+    {
+      "title": "Behavior",
+      "fields": [
+        { "id": "duration", "label": "Alert Duration (seconds)", "type": "number", "defaultValue": 5, "min": 1 },
+        {
+          "id": "queueMode",
+          "label": "Queue Mode",
+          "type": "select",
+          "defaultValue": "fifo",
+          "options": [
+            { "label": "First In, First Out", "value": "fifo" },
+            { "label": "Newest First", "value": "lifo" }
+          ]
+        },
+        {
+          "id": "note",
+          "label": "Custom Note",
+          "type": "text",
+          "defaultValue": "",
+          "placeholder": "Shown on the alert",
+          "note": "Field notes render below the label like this one."
+        }
+      ]
+    }
+  ]
+}
