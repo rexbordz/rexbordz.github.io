@@ -1,10 +1,3 @@
-/* ============================================================================
-   Multistream chat overlay — layout & motion
-   Every metric derives from --font-size (set by scripts/render.js from the
-   `fontSize` setting), so changing one number rescales the whole overlay.
-   `font` (the `font` setting) sets --font-family instead.
-   ========================================================================== */
-
 :root {
   --font-size: 15px;            /* message text size — the scale root */
   --font-family: Figtree, system-ui, -apple-system, sans-serif;
@@ -160,13 +153,6 @@ html, body {
   transform: scale(1);
 }
 
-/* Kick/TikTok's PNGs are full-bleed app icons (mark + rounded background baked in),
-   unlike the padded logomark SVGs — shrink them so they don't sit flush against the chip's own edges. */
-/* .platform[data-platform="kick"] .platform-logo,
-.platform[data-platform="tiktok"] .platform-logo {
-  transform: scale(0.9);
-} */
-
 .badges {
   display: flex;
   align-items: center;
@@ -185,17 +171,7 @@ html, body {
   background-size: contain;
 }
 
-/* TikTok's badges are finished, self-styled elements from TikTok.createBadges
-   (widget-core/utils/tiktok.js): they bring their own colors, borders, TikTok Sans
-   and every proportion, so none of the .badge rules above apply to them and there is
-   no badge design to restate here.
-
-   All they take from us is a scale. font-size is it — the pill, icon, padding,
-   corners and borders are all multiples of it, so this one line sizes the whole
-   badge. 0.65 is the same multiplier .badge uses for the other platforms, which is
-   what lands TikTok's pills on --chip and its labels at the size of theirs.
-
-   Want them bigger or smaller? Change 0.65, nothing else. */
+/* Want them bigger or smaller? Change 0.65, nothing else. */
 .badges[data-platform="tiktok"] {
   font-size: calc(var(--font-size) * 0.65);
 }
@@ -360,12 +336,6 @@ html, body {
   text-overflow: ellipsis;
 }
 
-/* Motion lives in scripts/render.js (Web Animations API) so each message animates
-   exactly once, keyed to its id rather than to a DOM node. The one exception is
-   .bubble's border-radius: a pill's corners answer to its neighbours, not to its own
-   arrival, so that morph is a CSS transition timed off --dur-in / --dur-out. */
-
-
 /* Toast notifications */
 
 .notifications {
@@ -392,7 +362,6 @@ html, body {
   background: #202022;
   animation: show 0.3s ease 1 forwards;
 }
-
 
 .toast i{
   color: var(--color);
