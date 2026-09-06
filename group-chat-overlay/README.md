@@ -49,8 +49,8 @@ There's 2 ways to accomplish this:
 
 The settings page is programmed to detect any live browser source of the widget. To edit any existing one, just load that browser source by following the steps in the screenshot.
 
-![Edit 1](docs/assets/edit1.png)
+![Edit 1](docs/assets/Edit1.png)
 
 When you're done editing the settings, just click `Save to Source` and it will automatically update the browser source in OBS.
 
-![Edit 2](docs/assets/edit2.png)
+![Edit 2](docs/assets/Edit2.png)
