@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="../../.shared/assets/images/favicon.ico">
+  <title>MultiPoll Overlay Settings</title>
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: #111;
+    }
+
+    #settingsCoreFrame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <iframe id="settingsCoreFrame" title="Settings"></iframe>
+
+  <script>
+    (function () {
+      const CORE_BASE = '../../.shared/core/settings/';
+      const frame = document.getElementById('settingsCoreFrame');
+      const currentDir = window.location.href.replace(/index\.html(?:\?.*)?$/, '');
+      const rootDir = currentDir.replace(/settings\/$/, '');
+
+      // The folder root, not index.html directly: servers serve index.html as the
+      // default document, so generated links (copy-link, save-to-source, new-source)
+      // stay clean, while an OBS source that does have index.html in its URL still
+      // matches, since it starts with this same prefix.
+      const widgetUrl = rootDir;
+      const previewWidgetUrl = rootDir + 'index.preview.html';
+
+      const bootConfig = {
+        configUrl: currentDir + 'settings.json',
+        hooksUrl: currentDir + 'settings.js',
+        // The real overlay root, so the settings core's OBS source detection, "save to OBS",
+        // and copy-link all point at the widget people actually add to their scenes.
+        widgetUrl: widgetUrl,
+        page: {
+          widgetTitle: 'MultiPoll Widget',
+          storageKey: 'multipoll-settings',
+        },
+      };
+      
+      frame.src = CORE_BASE + 'index.html#boot=' + encodeURIComponent(JSON.stringify(bootConfig));
+
+      // index.html only renders once a live poll starts, so it'd sit blank in the
+      // settings live-preview panel. Redirect just that one iframe to the static
+      // index.preview.html mockup, without touching widgetUrl (and therefore
+      // without touching OBS detection/save-to-source/copy-link above). Installed
+      // on the core frame's 'load' event, which fires before init()'s async
+      // config fetch resolves and before it ever sets previewFrame.src.
+      frame.addEventListener('load', () => {
+        const previewWindow = frame.contentWindow;
+        const previewFrameEl = previewWindow && previewWindow.document.getElementById('previewFrame');
+        if (!previewFrameEl) return;
+
+        const nativeSrc = Object.getOwnPropertyDescriptor(previewWindow.HTMLIFrameElement.prototype, 'src');
+        Object.defineProperty(previewFrameEl, 'src', {
+          configurable: true,
+          get() {
+            return nativeSrc.get.call(this);
+          },
+          set(value) {
+            const rewritten = typeof value === 'string' && value.startsWith(widgetUrl)
+              ? previewWidgetUrl + value.slice(widgetUrl.length)
+              : value;
+            nativeSrc.set.call(this, rewritten);
+          },
+        });
+      });
+    })();
+    
+  </script>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Multi Poll Widget — Redesign Sandbox</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+
+<body>
+  <div class="poll-wrapper" id="poll-widget">
+
+    <div class="poll-card">
+      <div class="poll-timer-overlay" style="width: 60%;"></div>
+      <div class="title">WHICH GAME NEXT?</div>
+      <div class="choices">
+        <div class="choice">
+          <div class="vote-key">1</div>
+          <div class="choice-main">
+            <div class="choice-label">
+              <div class="choice-text">Choice 1</div>
+              <div class="choice-right">
+                <div class="votes">(12 votes)</div>
+                <div class="percent">40%</div>
+              </div>
+            </div>
+            <div class="gauge">
+              <div class="gauge-fill choice-1" style="width: 40%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="choice">
+          <div class="vote-key">2</div>
+          <div class="choice-main">
+            <div class="choice-label">
+              <div class="choice-text">Choice 2</div>
+              <div class="choice-right">
+                <div class="votes">(8 votes)</div>
+                <div class="percent">27%</div>
+              </div>
+            </div>
+            <div class="gauge">
+              <div class="gauge-fill choice-2" style="width: 27%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="choice">
+          <div class="vote-key">3</div>
+          <div class="choice-main">
+            <div class="choice-label">
+              <div class="choice-text">Choice 3</div>
+              <div class="choice-right">
+                <div class="votes">(5 votes)</div>
+                <div class="percent">17%</div>
+              </div>
+            </div>
+            <div class="gauge">
+              <div class="gauge-fill choice-3" style="width: 17%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="choice">
+          <div class="vote-key">4</div>
+          <div class="choice-main">
+            <div class="choice-label">
+              <div class="choice-text">Choice 4</div>
+              <div class="choice-right">
+                <div class="votes">(3 votes)</div>
+                <div class="percent">10%</div>
+              </div>
+            </div>
+            <div class="gauge">
+              <div class="gauge-fill choice-4" style="width: 10%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="choice">
+          <div class="vote-key">5</div>
+          <div class="choice-main">
+            <div class="choice-label">
+              <div class="choice-text">Choice 5</div>
+              <div class="choice-right">
+                <div class="votes">(2 votes)</div>
+                <div class="percent">6%</div>
+              </div>
+            </div>
+            <div class="gauge">
+              <div class="gauge-fill choice-5" style="width: 6%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="choice">
+          <div class="vote-key">6</div>
+          <div class="choice-main">
+            <div class="choice-label">
+              <div class="choice-text">Choice 6</div>
+              <div class="choice-right">
+                <div class="votes">(1 votes)</div>
+                <div class="percent">3%</div>
+              </div>
+            </div>
+            <div class="gauge">
+              <div class="gauge-fill choice-6" style="width: 3%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="choice">
+          <div class="vote-key">7</div>
+          <div class="choice-main">
+            <div class="choice-label">
+              <div class="choice-text">Choice 7</div>
+              <div class="choice-right">
+                <div class="votes">(1 votes)</div>
+                <div class="percent">3%</div>
+              </div>
+            </div>
+            <div class="gauge">
+              <div class="gauge-fill choice-7" style="width: 3%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="choice">
+          <div class="vote-key">8</div>
+          <div class="choice-main">
+            <div class="choice-label">
+              <div class="choice-text">Choice 8</div>
+              <div class="choice-right">
+                <div class="votes">(1 votes)</div>
+                <div class="percent">3%</div>
+              </div>
+            </div>
+            <div class="gauge">
+              <div class="gauge-fill choice-8" style="width: 3%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="choice">
+          <div class="vote-key">9</div>
+          <div class="choice-main">
+            <div class="choice-label">
+              <div class="choice-text">Choice 9</div>
+              <div class="choice-right">
+                <div class="votes">(1 votes)</div>
+                <div class="percent">3%</div>
+              </div>
+            </div>
+            <div class="gauge">
+              <div class="gauge-fill choice-9" style="width: 3%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="choice">
+          <div class="vote-key">10</div>
+          <div class="choice-main">
+            <div class="choice-label">
+              <div class="choice-text">Choice 10</div>
+              <div class="choice-right">
+                <div class="votes">(1 votes)</div>
+                <div class="percent">3%</div>
+              </div>
+            </div>
+            <div class="gauge">
+              <div class="gauge-fill choice-10" style="width: 3%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notifications"></div>
+  <script>
+    (function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const cardBg = urlParams.get("card-bg");
+      const font = urlParams.get("font");
+      const fontSize = urlParams.get("font-size");
+      const colorChoice1 = urlParams.get("color-choice-1");
+      const colorChoice2 = urlParams.get("color-choice-2");
+      const colorChoice3 = urlParams.get("color-choice-3");
+      const colorChoice4 = urlParams.get("color-choice-4");
+      const colorChoice5 = urlParams.get("color-choice-5");
+      const colorChoice6 = urlParams.get("color-choice-6");
+      const colorChoice7 = urlParams.get("color-choice-7");
+      const colorChoice8 = urlParams.get("color-choice-8");
+      const colorChoice9 = urlParams.get("color-choice-9");
+      const colorChoice10 = urlParams.get("color-choice-10");
+      const alignTop = urlParams.get("align") === "top";
+
+      if (cardBg) document.documentElement.style.setProperty("--card-bg", cardBg);
+      if (font) document.documentElement.style.setProperty("--font", font);
+      if (fontSize) document.documentElement.style.setProperty("--font-size", fontSize);
+      if (colorChoice1) document.documentElement.style.setProperty("--color-choice-1", colorChoice1);
+      if (colorChoice2) document.documentElement.style.setProperty("--color-choice-2", colorChoice2);
+      if (colorChoice3) document.documentElement.style.setProperty("--color-choice-3", colorChoice3);
+      if (colorChoice4) document.documentElement.style.setProperty("--color-choice-4", colorChoice4);
+      if (colorChoice5) document.documentElement.style.setProperty("--color-choice-5", colorChoice5);
+      if (colorChoice6) document.documentElement.style.setProperty("--color-choice-6", colorChoice6);
+      if (colorChoice7) document.documentElement.style.setProperty("--color-choice-7", colorChoice7);
+      if (colorChoice8) document.documentElement.style.setProperty("--color-choice-8", colorChoice8);
+      if (colorChoice9) document.documentElement.style.setProperty("--color-choice-9", colorChoice9);
+      if (colorChoice10) document.documentElement.style.setProperty("--color-choice-10", colorChoice10);
+      document.getElementById("poll-widget")?.classList.toggle("align-top", alignTop);
+    })();
+  </script>
+</body>
+
+</html>

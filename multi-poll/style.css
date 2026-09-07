@@ -1,0 +1,282 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+@font-face {
+  font-family: 'URW DIN';
+  src: url('assets/fonts/URWDIN-Black.woff2') format('woff2'),
+       url('assets/fonts/URWDIN-Black.woff') format('woff');
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'URW DIN';
+  src: url('assets/fonts/URWDIN-Bold.woff2') format('woff2'),
+       url('assets/fonts/URWDIN-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'URW DIN';
+  src: url('assets/fonts/URWDIN-Medium.woff2') format('woff2'),
+       url('assets/fonts/URWDIN-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'URW DIN';
+  src: url('assets/fonts/URWDIN-Regular.woff2') format('woff2'),
+       url('assets/fonts/URWDIN-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+:root {
+  --card-bg: rgba(14, 14, 14, 0.98);
+  --card-radius: 24px;
+  --card-pad: 25px;
+  --card-shadow: 0 4px 10px rgba(0,0,0,0.4);
+
+  --font: 'InterVariable', 'Inter', sans-serif;
+  --font-size: 24px;
+  --text-color: #fff;
+  --muted: rgba(255,255,255,0.6);
+
+  --color-choice-1: #3b82f6;
+  --color-choice-2: #ef4444;
+  --color-choice-3: #22c55e;
+  --color-choice-4: #eab308;
+  --color-choice-5: #f97316;
+  --color-choice-6: #a855f7;
+  --color-choice-7: #1a9284;
+  --color-choice-8: #ec4899;
+  --color-choice-9: #84cc16;
+  --color-choice-10: #6366f1;
+}
+
+html, body, * {
+  font-family: var(--font);
+  font-feature-settings: 'liga' 1, 'calt' 1;
+}
+
+html {
+  height: 100%;
+  margin: 0;
+  background: transparent;
+  color: var(--text-color);
+}
+
+body {
+  background: transparent;
+}
+
+.poll-wrapper {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 28px;
+  width: 95%;
+  
+  display: flex;
+  justify-content: center;
+  /* Fade transition */
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.poll-wrapper.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Anchors the card to the top instead of the bottom, so it grows downward as
+   choices are added instead of growing upward. */
+.poll-wrapper.align-top {
+  top: 28px;
+  bottom: auto;
+}
+
+.poll-card {
+  font-size: var(--font-size);
+  background: var(--card-bg);
+  border-radius: var(--card-radius);
+  padding: var(--card-pad);
+  width: 100%;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5em;
+  position: relative; /* so overlay can be positioned */
+  overflow: hidden;
+}
+
+.poll-timer-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: rgba(226, 226, 226, 0.07); /* subtle white overlay */
+  width: 0%; /* will shrink with time */
+  pointer-events: none; /* clicks go through */
+  transition: width 1s linear; /* smooth shrink */
+}
+
+.title {
+  text-align: center;
+  font-size: 1.5em;
+  font-weight: bold;
+  user-select: none;
+}
+
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.choice {
+  display: grid;
+  grid-template-columns: auto 1fr auto; 
+  gap: 0.67em;
+  align-items: center;
+  min-height: 44px;
+  transition: opacity 0.3s ease, filter 0.3s ease, transform 0.3s ease;
+}
+
+.choice.winner {
+  filter: brightness(1.4); /* brighten winner */
+  transform: scale(1.01); /* optional subtle pop */
+}
+
+.choice.loser {
+  opacity: 0.3; /* dim losers */
+}
+
+.vote-key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2em;
+  background: rgba(70, 70, 70, 0.9);
+  padding: 6px 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 1.25em;
+  user-select: none;
+  transition: background-color 0.2s ease;
+}
+
+.vote-key.flash-choice-1   { background-color: color-mix(in srgb, var(--color-choice-1) 60%, white); }
+.vote-key.flash-choice-2    { background-color: color-mix(in srgb, var(--color-choice-2) 60%, white); }
+.vote-key.flash-choice-3  { background-color: color-mix(in srgb, var(--color-choice-3) 60%, white); }
+.vote-key.flash-choice-4 { background-color: color-mix(in srgb, var(--color-choice-4) 70%, white); }
+.vote-key.flash-choice-5 { background-color: color-mix(in srgb, var(--color-choice-5) 70%, white); }
+.vote-key.flash-choice-6 { background-color: color-mix(in srgb, var(--color-choice-6) 70%, white); }
+.vote-key.flash-choice-7   { background-color: color-mix(in srgb, var(--color-choice-7) 70%, white); }
+.vote-key.flash-choice-8   { background-color: color-mix(in srgb, var(--color-choice-8) 70%, white); }
+.vote-key.flash-choice-9   { background-color: color-mix(in srgb, var(--color-choice-9) 70%, white); }
+.vote-key.flash-choice-10   { background-color: color-mix(in srgb, var(--color-choice-10) 70%, white); }
+
+.vote-key.flash-choice-1,
+.vote-key.flash-choice-2,
+.vote-key.flash-choice-3,
+.vote-key.flash-choice-4,
+.vote-key.flash-choice-5,
+.vote-key.flash-choice-6,
+.vote-key.flash-choice-7,
+.vote-key.flash-choice-8,
+.vote-key.flash-choice-9,
+.vote-key.flash-choice-10  {
+  transform: translate(1px, 1px) scale(0.96);
+}
+
+.vote-key.choice-1 { background-color: var(--color-choice-1); }
+.vote-key.choice-2 { background-color: var(--color-choice-2); }
+.vote-key.choice-3 { background-color: var(--color-choice-3); }
+.vote-key.choice-4 { background-color: var(--color-choice-4); }
+.vote-key.choice-5 { background-color: var(--color-choice-5); }
+.vote-key.choice-6 { background-color: var(--color-choice-6); }
+.vote-key.choice-7 { background-color: var(--color-choice-7); }
+.vote-key.choice-8 { background-color: var(--color-choice-8); }
+.vote-key.choice-9 { background-color: var(--color-choice-9); }
+.vote-key.choice-10 { background-color: var(--color-choice-10); }
+
+.vote-key .winner-icon {
+  font-size: 1.1em;
+  animation: winner-icon-beat 1s ease-in-out infinite;
+}
+
+@keyframes winner-icon-beat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.4); }
+}
+
+.choice-main {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.choice-text {
+  font-size: 1em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.choice-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.gauge {
+  margin-top: 6px;
+  height: 0.4em;
+  background: rgba(70, 70, 70, 0.9);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.gauge-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: inherit;
+  transition: width 0.5s ease;
+}
+
+.gauge-fill.choice-1   { background-color: var(--color-choice-1); }
+.gauge-fill.choice-2    { background-color: var(--color-choice-2); }
+.gauge-fill.choice-3  { background-color: var(--color-choice-3); }
+.gauge-fill.choice-4 { background-color: var(--color-choice-4); }
+.gauge-fill.choice-5 { background-color: var(--color-choice-5); }
+.gauge-fill.choice-6 { background-color: var(--color-choice-6); }
+.gauge-fill.choice-7   { background-color: var(--color-choice-7); }
+.gauge-fill.choice-8   { background-color: var(--color-choice-8); }
+.gauge-fill.choice-9   { background-color: var(--color-choice-9); }
+.gauge-fill.choice-10   { background-color: var(--color-choice-10); }
+
+.choice-right {
+  display: flex;
+  gap: 5px;
+  font-size: 1em;
+  font-weight: 500;
+}
+
+
+.votes {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.percent {
+  font-weight: 600;
+}
+
+
+

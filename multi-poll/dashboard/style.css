@@ -1,0 +1,969 @@
+@font-face {
+  font-family: 'URW DIN';
+  src: url('../assets/fonts/URWDIN-Black.woff2') format('woff2'),
+       url('../assets/fonts/URWDIN-Black.woff') format('woff');
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'URW DIN';
+  src: url('../assets/fonts/URWDIN-Bold.woff2') format('woff2'),
+       url('../assets/fonts/URWDIN-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'URW DIN';
+  src: url('../assets/fonts/URWDIN-Medium.woff2') format('woff2'),
+       url('../assets/fonts/URWDIN-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'URW DIN';
+  src: url('../assets/fonts/URWDIN-Regular.woff2') format('woff2'),
+       url('../assets/fonts/URWDIN-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Your custom variables */
+:root {
+  --font: 'InterVariable', 'Inter', sans-serif;
+  --font-size: 18px;
+  --text-color: #fff;
+  --muted: rgba(255,255,255,0.6);
+
+  /* Dashboard gauges are neutral/light on purpose — per-choice colors are an overlay-only
+     concept, customizable there via the overlay's own CSS. */
+  --gauge-color: rgba(255, 255, 255, 0.92);
+
+  /* Shared placeholder color for wa-input and the native choice inputs. */
+  --placeholder-color: #494d57;
+
+  /* Shared with .copy-btn (modal.css) so it always matches .modal-button. */
+  --modal-button-bg: linear-gradient(180deg, #3d3d3d, #292929);
+  --modal-button-bg-hover: linear-gradient(180deg, #484848, #333333);
+}
+
+html, body, * {
+  font-family: 'InterVariable', 'Inter', sans-serif;
+  font-feature-settings: 'liga' 1, 'calt' 1;
+  color: white;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow-x: hidden; /* prevent horizontal scroll */
+  overflow-y: auto;   /* allow vertical scroll */
+  background-color: #181818;
+}
+
+/* Page scrollbar.
+   Keep these selectors in their own rule — never merge them into a list that also
+   contains `wa-dialog::part(body)::-webkit-scrollbar`. Chaining ::-webkit-scrollbar
+   onto ::part() parses in current Chromium but is a syntax error in the older CEF
+   that OBS embeds, and one invalid selector discards the ENTIRE comma-separated
+   list. That takes `width` down with it, and with no base ::-webkit-scrollbar rule
+   matching, Chromium falls back to the native scrollbar (arrow buttons and all)
+   while the -thumb/-track rules below sit inert. Same reason the modal and .code
+   scrollbars each get their own rule rather than sharing one.
+
+   Also deliberately NOT using `scrollbar-width`/`scrollbar-color`: any non-auto
+   value there makes Chromium ignore these pseudo-elements and draw the flat
+   native bar instead. */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  height: 10px; /* horizontal scrollbar */
+  width: 10px;
+}
+
+/* No arrow buttons at the ends — Chromium draws them by default on a custom scrollbar
+   unless they're explicitly zeroed out. */
+html::-webkit-scrollbar-button,
+body::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* Track */
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+  background: #1c1c1c;
+}
+
+/* Thumb — fully pilled. The transparent border + padding-box clip insets the pill
+   from the track edges without having to hardcode the track color into the border. */
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+  background-color: #555;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Hover */
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover {
+  background-color: #777;
+}
+
+/* The code block's own horizontal scrollbar. The dialog body's scrollbar is NOT here —
+   it lives in wa-dialog's shadow root and is styled by scripts/dialog-scrollbar.js. */
+.code::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+}
+
+/* Loading overlay - shown until the WA custom elements loaded, so the user never sees a pre-upgrade flash. */
+#loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+
+  background-color: #181818;
+
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+#loading-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loading-logo {
+  width: 86px;
+  height: 86px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 8px solid rgba(255, 255, 255, 0.15);
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: loading-spinner-spin 0.75s linear infinite;
+}
+
+@keyframes loading-spinner-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Settings Page */
+.rexbordz-logo {
+  width: 32px;
+  height: 32px;
+  padding-top: 3px;
+}
+.settings-container {
+  width: 100%;
+  max-width: 100%; /* wider maximum width */
+  margin: auto;
+  padding: 20px;
+  background-color: #181818;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-sizing: border-box; /* include padding in width */
+}
+
+.settings-container h1 {
+  text-align: center;
+  font-size: 1.5em;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+/* Header Section*/
+.dock-header {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-weight: 900;
+  font-size: 1.6em;
+
+  background-color: #141414;
+  color: #fff;
+
+  padding: 10px 18px;
+  margin: 0;
+  width: 100%;
+
+  box-sizing: border-box;
+  box-shadow:
+    2px 2px 6px rgba(0,0,0,0.45),
+    2px 2px 8px rgba(0,0,0,0.35);
+
+  container-type: inline-size;
+}
+
+/* Below this width the actions start crowding the title — drop the text, keep the logo. */
+@container (max-width: 272px) {
+  .widget-title .text {
+    display: none;
+  }
+}
+
+.dock-header-left {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: 0;
+}
+
+.widget-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.widget-title .text {
+  font-family: 'URW DIN';
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.widget-actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 3px;
+}
+
+.dock-header button {
+  padding: 0;
+  border-radius: 10px;
+  overflow: visible;
+}
+
+.action-btn {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  min-height: 34px;
+
+  padding: 0;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+
+  background: #1f1f1f;
+  color: #bbb;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+}
+
+.saved-polls-btn {
+  background: none !important;
+  border: none !important;
+  position: relative;
+  color: #bbb;
+  box-shadow: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.saved-polls-btn wa-icon {
+  position: relative;
+  z-index: 1;
+  font-size: 18px;
+}
+
+/* Colorless ripple — same expanding-circle technique as .integration-check::before. */
+.saved-polls-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.15);
+
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.saved-polls-btn:hover::before {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+.saved-polls-btn.action-btn:hover {
+  background: none !important;
+  color: #fff;
+  transform: none;
+}
+
+.integration-check {
+  background: none !important; /* Removes the box background */
+  border: none !important;     /* Removes the border */
+  position: relative;          /* Needed to anchor the warning dot */
+  color: #bbb;
+  box-shadow: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+/* Colorless ripple — same expanding-circle technique as .saved-polls-btn::before (pro). */
+.integration-check::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.15);
+
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.integration-check:hover::before {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+.integration-check wa-icon {
+  position: relative;
+  z-index: 1;
+  font-size: 20px;
+}
+
+/* Hover: ripple + brighten only, no box background or icon movement */
+.integration-check:hover {
+  background: none !important;
+}
+
+.integration-check.action-btn:hover {
+  background: none !important;
+  color: #fff;
+  transform: none;
+}
+
+/* The Yellow Warning Dot */
+.integration-check.warning::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 7px;
+  height: 7px;
+  background-color: #eab308; /* Yellow */
+  border-radius: 50%;
+  
+  /* Subtle static glow */
+  box-shadow: 
+    0 0 4px rgba(234, 179, 8, 0.8),
+    0 0 8px rgba(234, 179, 8, 0.4);
+    
+  /* Kept attached rather than static-positioned — reads as more integrated */
+}
+
+/* To hide the indicator, simply remove the .warning class via JS */
+.integration-check:not(.warning)::after {
+  display: none;
+}
+
+.action-btn:hover {
+  background: #2a2a2a;
+  color: #fff;
+  transform: scale(1.25) rotate(-5deg);
+}
+
+.action-btn:active {
+  transform: translateY(0);
+}
+
+.status-indicator {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  position: relative; /* Essential for the overlay to anchor here */
+  transition: background-color 0.3s ease;
+  padding: 0;
+  display: block;
+  margin-left: 5px;
+}
+
+/* The Overlay Circle */
+.status-indicator::before {
+  content: '';
+  position: absolute;
+  /* Centering the overlay */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  
+  /* Make the overlay slightly larger than the dot */
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  
+  /* Semi-transparent background */
+  background: rgba(255, 255, 255, 0.15);
+  
+  /* Smooth expansion animation */
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+  opacity: 0;
+  pointer-events: none; /* Mouse clicks go through to the button */
+}
+
+/* Hover Animation */
+.status-indicator:hover::before {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+/* Optional: Match the overlay color to the status */
+.status-indicator.online:hover::before {
+  background: rgba(34, 197, 94, 0.2); /* Subtle green glow */
+}
+
+.status-indicator.offline:hover::before {
+  background: rgba(239, 68, 68, 0.2); /* Subtle red glow */
+}
+
+/* Online */
+.status-indicator.online {
+  background-color: #22c55e;
+  box-shadow: 0 0 5px rgba(34, 197, 94, 0.8), 
+              0 0 12px rgba(34, 197, 94, 0.4);
+}
+
+/* Offline */
+.status-indicator.offline {
+  background-color: #ef4444;
+  box-shadow: 0 0 5px rgba(239, 68, 68, 0.7), 
+              0 0 12px rgba(239, 68, 68, 0.3);
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.input-group label {
+  font-weight: bold;
+  font-size: 0.95em;
+  margin-bottom: 5px;
+}
+
+/* WA custom elements render unstyled until they upgrade — hide until then. */
+wa-input:not(:defined),
+wa-select:not(:defined),
+wa-option:not(:defined),
+wa-number-input:not(:defined) {
+  visibility: hidden;
+}
+
+/* Host-level reset — WA's default margin-block would stack on top of .input-group's flex `gap`. */
+.input-group wa-input,
+.input-group wa-select,
+.input-group wa-number-input {
+  display: block;
+  width: 100%;
+  margin: 0;
+}
+
+/* Shared WA input theming — also used by the connection modal, one definition for both. */
+wa-input::part(input-wrapper) {
+  background: #101010;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+
+wa-input::part(input) {
+  color: #fff;
+}
+
+wa-input::part(input)::placeholder {
+  color: var(--placeholder-color);
+}
+
+wa-input::part(form-control-label) {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #bbb;
+  margin-bottom: 8px;
+}
+
+wa-select::part(combobox) {
+  background: #101010;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+
+wa-select::part(listbox) {
+  background: #101010;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+
+wa-select::part(display-input) {
+  color: #fff;
+}
+
+wa-number-input::part(number-input) {
+  background: #101010;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+
+wa-number-input::part(input) {
+  color: #fff;
+}
+
+wa-number-input::part(input)::placeholder {
+  color: var(--placeholder-color);
+}
+
+/* Match the settings page's original native-input sizing — the modal's own inputs keep WA's default size. */
+.settings-container wa-input::part(input-wrapper),
+.settings-container wa-select::part(combobox),
+.settings-container wa-number-input::part(number-input) {
+  min-height: 0;
+  height: auto;
+  padding: 8px 12px;
+}
+
+/* The settings page uses external <label> elements, not WA's slotted
+   label - so the label part is never actually rendered here, but its
+   margin-bottom still reserves the space underneath every control,
+   stacking on top of .input-group's own `gap` and widening the visual
+   spacing beyond what the flex gap value alone would suggest. */
+.settings-container wa-input::part(form-control-label),
+.settings-container wa-select::part(form-control-label),
+.settings-container wa-number-input::part(form-control-label) {
+  margin-bottom: 0;
+}
+
+.settings-container wa-input::part(input),
+.settings-container wa-select::part(display-input),
+.settings-container wa-number-input::part(input) {
+  padding: 0;
+  line-height: 1.2;
+  font-size: 0.95em;
+}
+
+/* Programmatic-only entry, never clickable. Not `disabled` — wa-select rejects .value being set to a disabled option. */
+wa-select wa-option[value="custom"] {
+  display: none;
+}
+
+.time-text {
+  font-family: "Roboto Mono", "Space Mono", monospace;
+}
+
+.choice-input:focus {
+  outline: none;
+}
+
+.choice-container:focus-within {
+  outline: var(--wa-focus-ring);
+  outline-offset: var(--wa-focus-ring-offset);
+}
+
+.choice-input::placeholder {
+  color: var(--placeholder-color);
+}
+
+.choice-container {
+  position: relative;
+  isolation: isolate; /* confines .choice-input's mix-blend-mode to this container's own layers */
+  display: flex;
+  align-items: center;
+
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #101010;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  /* Kept snug to the real row height: max-height is what animates the collapse, and
+     any slack above the natural height burns transition time with nothing visibly
+     moving, which reads as a pause followed by a snap. Mirrors how the row is built
+     — one line of text plus the input's fixed padding and the border — so it stays
+     just clear of the content at any font size rather than clipping or over-slacking. */
+  max-height: calc(1.2em + 20px);
+  opacity: 1;
+
+  transition:
+    max-height 0.5s ease-in-out,
+    margin 0.5s ease-in-out,
+    border-width 0.5s ease-in-out,
+    opacity 0.35s ease,
+    transform 0.5s ease-in-out;
+}
+
+/* Winner effect in settings */
+.choice-container.winner {
+  filter: brightness(1.3);
+  transform: scale(1.02);
+  transition: transform 0.3s ease, filter 0.3s ease;
+  z-index: 10; /* Ensure it pops above others */
+}
+
+.choice-container.loser {
+  opacity: 0.5;
+  filter: grayscale(0.5);
+  transition: opacity 0.3s ease;
+}
+
+/* Flags a required choice left blank on a failed Start Poll attempt.
+   Stays until that field is actually filled in — see required-missing handling in dashboard-ui.js. */
+.choice-container.required-missing {
+  box-shadow: 0 0 0 1.5px rgba(239, 68, 68, 0.85);
+}
+
+.choice-input {
+  width: 100%;
+  flex: 1 1 100%;
+
+  min-width: 0;
+
+  padding: 8px 12px;
+  font-size: 0.95em;
+
+  background: transparent !important;
+  border: none;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  z-index: 2;
+
+  /* Knockout effect: white text differenced against the light gauge-fill reads as
+     black wherever the gauge overlaps it, and stays white over the dark background
+     everywhere else — no duplicated text layers needed. */
+  mix-blend-mode: difference;
+}
+
+/* Add-choice button — dashboard's own choice list is capped at 5 (choices 6-10 are a PRO
+   feature). Clicking it opens the Locked Feature modal instead of adding a row. */
+.add-choice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  padding: 10px;
+
+  font-size: 1rem;
+  font-weight: bold;
+
+  background-color: #101010;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+
+  max-height: calc(1.4em + 24px); /* snug to the button's height — see .choice-container */
+  opacity: 1;
+  overflow: hidden;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    max-height 0.5s ease-in-out,
+    padding 0.5s ease-in-out,
+    margin-top 0.5s ease-in-out,
+    border-width 0.5s ease-in-out,
+    opacity 0.35s ease;
+}
+
+.add-choice:hover {
+  background-color: #1c1c1c;
+  border-color: #3b82f6;
+  color: #fff;
+}
+
+.choice-stats {
+  position: absolute;
+  right: 10px;
+
+  display: flex;
+  gap: 10px;
+
+  font-size: 0.85em;
+  white-space: nowrap;
+  pointer-events: none;
+
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(19, 19, 19, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.35);
+
+  opacity: 0;
+  transform: translateX(6px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+
+  z-index: 3;
+}
+
+
+/* Default: Hide stats and gauge when poll is NOT running */
+#choices-group .choice-stats {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#choices-group .gauge-fill.config-page {
+  visibility: hidden;
+  transition: width 0.5s ease, visibility 0.3s ease;
+}
+
+.gauge-fill.config-page {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%; /* Fill the container height */
+  z-index: 1; /* Bottom Layer */
+  background-color: var(--gauge-color);
+  transition: width 0.5s ease, opacity 0.3s ease;
+}
+
+/* When poll is ACTIVE (we will toggle this class via JS) */
+/* Update this block in your CSS */
+#choices-group.poll-active .choice-stats {
+  opacity: 1; /* Force visibility for testing */
+  font-weight: 500;
+  transform: translateX(0);
+}
+
+#choices-group.poll-active .gauge-fill.config-page {
+  visibility: visible;
+}
+
+/* Row spacing here is margin, not .input-group's flex `gap`: `gap` reserves its
+   space between every pair of children no matter how small they collapse, so the
+   hidden rows still left a dead band above Poll Duration. Margin collapses with
+   the row. Note this rule must NOT declare `transition` — its ID specificity
+   would replace the whole transition shorthand on .choice-container/.add-choice
+   and their height/opacity animations would stop running. */
+#choices-group {
+  gap: 0;
+}
+
+#choices-group > *:not(:first-child) {
+  margin-top: 5px;
+}
+
+/* Auto-hide containers with empty inputs when poll is active */
+/* 2. THE SMOOTH HIDE: Replace your display:none logic with this */
+#choices-group.poll-active .choice-container:has(input:placeholder-shown) {
+  max-height: 0;
+  margin-top: 0;
+  border-width: 0; /* animated to 0 rather than `border: none`, which would snap */
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Hide the Add Choice button too while a poll is running, with the same collapse.
+   Its padding has to go as well — a 0-height box still renders its padding, which
+   is what was leaving a gap above Poll Duration. */
+#choices-group.poll-active #add-choice-btn {
+  max-height: 0;
+  padding-block: 0;
+  margin-top: 0;
+  border-width: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Lock inputs during the poll so you don't accidentally type while people vote */
+#choices-group.poll-active .choice-input {
+  font-weight: bold;
+  pointer-events: none;
+  cursor: default;
+}
+
+.choice-header {
+  display: flex;
+  justify-content: space-between; /* Pushes Label to left, Timer to right */
+  align-items: center;            /* Vertically centers them */
+  width: 100%;
+}
+
+.choice-header label {
+  margin-bottom: 5px; 
+}
+
+@property --pie-pct {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 1;
+}
+
+.time-remaining {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  font-weight: bold;
+  font-size: 0.9em; /* Slightly smaller for a "dashboard" look */
+  color: #ffffff;
+
+  /* 0.5s Ease-In-Out Fade Logic */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+}
+
+/* Hidden for permanent polls. A class, not an inline `display` — inline would
+   override the flex above and drop the pie onto its own line. */
+.time-remaining.hidden {
+  display: none;
+}
+
+/* When the poll is active, fade the timer in */
+#choices-group.poll-active .time-remaining {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Minimal pie-wipe timer — a filled slice that drains clockwise as --pie-pct counts
+   down from 1 (full) to 0 (empty), synced 1:1 with the countdown text next to it. */
+.time-pie {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: conic-gradient(#fff calc(var(--pie-pct) * 360deg), rgba(255, 255, 255, 0.25) 0);
+  transition: --pie-pct 1s linear;
+}
+
+.percent {
+  font-weight: 600;
+}
+
+/* Button Group */
+.button-group {
+  display: flex;
+  flex-wrap: wrap; /* wraps on smaller screens */
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.button-group button {
+  flex: 1 1 45%; /* grow/shrink with container, min 45% */
+  padding: 10px 0;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #3d3d3d, #292929);
+  color: #fff;
+  cursor: pointer;
+  font-weight: bolder;
+  font-size: 0.9rem;
+  transition: background 0.2s ease;
+}
+
+button {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+#dock-buttons button:active::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.3);
+  animation: flash 0.2s ease;
+} 
+
+@keyframes flash {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+#start-end-poll {
+  flex: 1 1 100%; /* full width of first row */
+}
+
+/* Let the other two buttons share the next row */
+#toggle-poll,
+#reset-poll {
+  flex: 1 1 48%; /* each takes about half the row */
+}
+
+#start-end-poll {
+  /* Electric-blue gradient — same blue family as the logo, subtle rather than neon. */
+  background: linear-gradient(180deg, #3b82f6, #1c3faa);
+  color: #fff;
+  position: relative; /* Required for the pseudo-element */
+  overflow: hidden; /* Ensures the overlay stays within rounded corners */
+  transition: filter 0.2s ease;
+  cursor: pointer;
+}
+
+#start-end-poll:hover {
+  filter: brightness(1.1);
+}
+
+/* "End Poll"/"Closing" state — a class, not inline background-color, which the gradient would paint over. */
+#start-end-poll.is-ending {
+  background: linear-gradient(180deg, #ef4444, #7f1d1d);
+}
+
+.button-group button:hover {
+  background: linear-gradient(180deg, #484848, #333333);
+}
+
+/* Small screen adjustments */
+@media (max-width: 450px) {
+  .button-group {
+    flex-direction: column;
+  }
+  .button-group button {
+    flex: 1 1 100%;
+  }
+}

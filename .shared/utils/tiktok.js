@@ -18,7 +18,7 @@ const TikTok = {
 
   // Where the shortcode PNGs below are served from. A widget that keeps its own
   // copy of the artwork can repoint this instead of forking the module.
-  emoteBase: 'https://rexbordz.github.io/widget-core/assets/images/tiktok/emotes/',
+  emoteBase: 'https://rexbordz.github.io/.shared/assets/images/tiktok/emotes/',
 
   // Shortcodes a viewer can type in TikTok chat. A value ending in .png names a
   // file under emoteBase; anything else is passed straight through as unicode.

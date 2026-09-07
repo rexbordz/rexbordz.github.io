@@ -1,0 +1,111 @@
+{
+  "sections": [
+    {
+      "title": "Overlay Settings",
+      "fields": [
+        {
+          "id": "font",
+          "label": "Font",
+          "type": "font",
+          "defaultValue": "",
+          "placeholder": "Inter",
+          "bundledFonts": [
+            {
+              "name": "Inter",
+              "css": "https://rsms.me/inter/inter.css"
+            },
+            "URW DIN",
+            {
+              "name": "Poppins",
+              "css": "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+            }
+          ]
+        },
+        {
+          "id": "size",
+          "param": "font-size",
+          "label": "Font Size (px)",
+          "type": "number",
+          "defaultValue": "",
+          "placeholder": 24
+        },
+        {
+          "id": "align",
+          "label": "Alignment",
+          "type": "select",
+          "defaultValue": "bottom",
+          "options": [
+            { "label": "Align Bottom", "value": "bottom" },
+            { "label": "Align Top", "value": "top" }
+          ]
+        },
+        {
+          "id": "card-bg",
+          "label": "Background Color",
+          "type": "color-rgba",
+          "defaultValue": "rgba(14, 14, 14, 0.98)"
+        },
+        {
+          "id": "color-choice-1",
+          "label": "Choice 1 Color",
+          "type": "color-hex",
+          "defaultValue": "#3b82f6"
+        },
+        {
+          "id": "color-choice-2",
+          "label": "Choice 2 Color",
+          "type": "color-hex",
+          "defaultValue": "#ef4444"
+        },
+        {
+          "id": "color-choice-3",
+          "label": "Choice 3 Color",
+          "type": "color-hex",
+          "defaultValue": "#22c55e"
+        },
+        {
+          "id": "color-choice-4",
+          "label": "Choice 4 Color",
+          "type": "color-hex",
+          "defaultValue": "#eab308"
+        },
+        {
+          "id": "color-choice-5",
+          "label": "Choice 5 Color",
+          "type": "color-hex",
+          "defaultValue": "#f97316"
+        },
+        {
+          "id": "color-choice-6",
+          "label": "Choice 6 Color",
+          "type": "color-hex",
+          "defaultValue": "#a855f7"
+        },
+        {
+          "id": "color-choice-7",
+          "label": "Choice 7 Color",
+          "type": "color-hex",
+          "defaultValue": "#1a9284"
+        },
+        {
+          "id": "color-choice-8",
+          "label": "Choice 8 Color",
+          "type": "color-hex",
+          "defaultValue": "#ec4899"
+        },
+        {
+          "id": "color-choice-9",
+          "label": "Choice 9 Color",
+          "type": "color-hex",
+          "defaultValue": "#84cc16"
+        },
+        {
+          "id": "color-choice-10",
+          "label": "Choice 10 Color",
+          "type": "color-hex",
+          "defaultValue": "#6366f1"
+        }
+      ]
+    }
+  ]
+}

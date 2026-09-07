@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en" class="wa-dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MultiPoll Controller</title>
+  <link rel="icon" type="image/x-icon" href="../assets/images/favicon.ico">
+
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="modal.css">
+
+  <!-- Streamer.bot -->
+  <script src="https://cdn.jsdelivr.net/npm/@streamerbot/client/dist/streamerbot-client.min.js"></script>
+
+  <!-- Web Awesome -->
+  <link rel="stylesheet" href="https://ka-f.webawesome.com/webawesome@3.11.0/styles/themes/default.css">
+  <script type="module" src="https://ka-f.webawesome.com/webawesome@3.11.0/webawesome.loader.js"></script>
+
+</head>
+<body>
+  <div id="loading-overlay">
+    <img src="../assets/images/circle-logo.png" alt="" class="loading-logo">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <h1 class="dock-header">
+    <div class="dock-header-left">
+      <div class="widget-title">
+        <img src="../assets/images/rexbordz-blue-and-white-gradient-logo.png" 
+            alt="rexbordz logo" 
+            class="rexbordz-logo">
+        <span class="text">MULTIPOLL</span>
+      </div>
+    </div>
+
+    <div class="widget-actions">
+      <!-- Saved Polls Button (PRO feature — opens the upsell modal here) -->
+      <button class="action-btn saved-polls-btn"
+              title="Saved Polls">
+        <wa-icon name="bookmark"></wa-icon>
+      </button>
+
+      <!-- Integration Check Button -->
+      <button class="action-btn integration-check"
+              title="Streamer.bot Actions Status">
+        <wa-icon name="bolt-lightning"></wa-icon>
+      </button>
+
+      <!-- Status Indicator -->
+      <button class="status-indicator offline"
+              title="Disconnected from Streamer.bot">
+      </button>
+    </div>
+  </h1>
+
+  <div class="settings-container">
+    <!-- Poll Title -->
+    <div class="input-group">
+      <label for="poll-title">Prompt</label>
+      <wa-input type="text" id="poll-title" placeholder="Type number (1, 2...) in chat to vote"></wa-input>
+    </div>
+
+    <!-- Choices -->
+    <div class="input-group" id="choices-group">
+      <div class="choice-header">
+        <label>Choices</label>
+        <div class="time-remaining">
+          <div class="time-pie"></div>
+          <span class="time-text"></span>
+        </div>
+      </div>
+
+      <!-- Choice 1 (Required) -->
+      <div class="choice-container">
+        <input type="text" class="choice-input" value="Choice 1" placeholder="Required" required>
+        <div class="gauge-fill config-page choice-1" style="width: 0%;"></div>
+        <div class="choice-stats">
+          <span class="votes config-page">0 votes</span>
+          <span class="percent config-page">0%</span>
+        </div>
+      </div>
+
+      <!-- Choice 2 (Required) -->
+      <div class="choice-container">
+        <input type="text" class="choice-input" value="Choice 2" placeholder="Required" required>
+        <div class="gauge-fill config-page choice-2" style="width: 0%;"></div>
+        <div class="choice-stats">
+          <span class="votes config-page">0 votes</span>
+          <span class="percent config-page">0%</span>
+        </div>
+      </div>
+
+      <!-- Choice 3 (Optional) -->
+      <div class="choice-container">
+        <input type="text" class="choice-input" placeholder="Optional">
+        <div class="gauge-fill config-page choice-3" style="width: 0%;"></div>
+        <div class="choice-stats">
+          <span class="votes config-page">0 votes</span>
+          <span class="percent config-page">0%</span>
+        </div>
+      </div>
+
+      <!-- Choice 4 (Optional) -->
+      <div class="choice-container">
+        <input type="text" class="choice-input" placeholder="Optional">
+        <div class="gauge-fill config-page choice-4" style="width: 0%;"></div>
+        <div class="choice-stats">
+          <span class="votes config-page">0 votes</span>
+          <span class="percent config-page">0%</span>
+        </div>
+      </div>
+
+      <!-- Choice 5 (Optional) -->
+      <div class="choice-container">
+        <input type="text" class="choice-input" placeholder="Optional">
+        <div class="gauge-fill config-page choice-5" style="width: 0%;"></div>
+        <div class="choice-stats">
+          <span class="votes config-page">0 votes</span>
+          <span class="percent config-page">0%</span>
+        </div>
+      </div>
+
+      <!-- 6-10 more choices is a PRO feature — opens the upsell modal here instead of adding a row. -->
+      <button type="button" id="add-choice-btn" class="add-choice"><wa-icon name="plus"></wa-icon></button>
+    </div>
+
+    <!-- Duration -->
+    <div class="input-group">
+      <label for="duration-dropdown">Duration</label>
+      <wa-select id="duration-dropdown" value="0">
+        <wa-option value="15">15s</wa-option>
+        <wa-option value="30">30s</wa-option>
+        <wa-option value="60">1m</wa-option>
+        <wa-option value="120">2m</wa-option>
+        <wa-option value="600">10m</wa-option>
+        <wa-option value="0">Permanent</wa-option>
+        <wa-option value="custom">Custom</wa-option> <!-- programmatic-only, hidden via CSS; NOT disabled — wa-select rejects setting .value to a disabled option's value -->
+      </wa-select>
+      <wa-number-input id="duration-input" min="0" placeholder="Custom seconds"></wa-number-input>
+    </div>
+
+    <!-- Buttons -->
+    <div class="button-group" id="dock-buttons">
+      <button id="start-end-poll">Start Poll</button> 
+      <button id="toggle-poll">Toggle Poll</button>
+      <button id="reset-poll">Clear</button>
+    </div>
+  </div>
+
+  <!-- Connection Modal -->
+  <wa-dialog id="connection-dialog" class="connection-dialog">
+    <div slot="label" class="modal-header-left">
+      <img src="../assets/images/streamerbot-logo.svg" class="modal-icon" alt="logo">
+      <span class="modal-title">MULTIPOLL</span>
+    </div>
+
+    <div class="modal-warning hidden">
+      Disconnected from Streamer.bot
+    </div>
+
+    <div class="form-row two-cols">
+      <div class="form-group">
+        <label for="sb-address">Address <span class="required">*</span></label>
+        <input type="text" id="sb-address">
+      </div>
+
+      <div class="form-group">
+        <label for="sb-port">Port <span class="required">*</span></label>
+        <input type="text" id="sb-port">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group full">
+        <wa-input id="sb-password" type="password" password-toggle>
+          <span slot="label">Password</span>
+        </wa-input>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <button class="modal-button" id="connect-btn" type="button" autofocus>Connect</button>
+    </div>
+  </wa-dialog>
+
+  <!-- Streamer.bot Integration-Check Modal -->
+  <wa-dialog id="sb-actions-dialog" label="Streamer.bot Integration" class="sb-actions-dialog">
+    <div class="status-text">Some actions are not found</div>
+
+    <div class="actions-list"></div>
+
+    <div class="import-label">Import the following to Streamer.bot:</div>
+
+    <div class="code-row">
+      <div class="code" id="codeBox"></div>
+      <wa-copy-button id="import-copy-btn" class="copy-btn"
+        copy-label="Copy" success-label="Copied!" error-label="Failed to copy"></wa-copy-button>
+    </div>
+
+    <div class="tip-line">
+      <a href="https://github.com/rexbordz/multi-poll-widget/tree/main/streamdeck"
+        target="_blank"
+        rel="noopener noreferrer">
+        Download Stream Deck Profile
+      </a>
+    </div>
+
+    <button id="integration-recheck-btn" class="modal-button" autofocus>Recheck</button>
+  </wa-dialog>
+
+  <!-- Locked Feature Modal — shown by PRO-only controls (add-choice, saved polls) on the free build. -->
+  <wa-dialog id="locked-feature-dialog" label="Locked Feature" class="locked-feature-dialog" light-dismiss>
+    <p class="locked-feature-intro">
+      This feature is for PRO version only. Get the Pro version by subscribing Tier 2 (10$) on
+      rexbordz's Patreon and have access to the following features:
+    </p>
+
+    <ul class="locked-feature-list">
+      <li>Add up to 10 choices</li>
+      <li>Save up to 10 polls as presets</li>
+    </ul>
+
+    <p class="locked-feature-note">
+      Note: You only need to subscribe and authenticate ONCE and the PRO version is yours.
+      No monthly commitment needed.
+    </p>
+
+    <wa-button class="locked-feature-cta" variant="brand"
+      href="https://www.patreon.com/rexbordz/posts/multipoll-widget-166929219" target="_blank" rel="noopener noreferrer">
+      Buy PRO
+    </wa-button>
+  </wa-dialog>
+
+  <script type="module" src="scripts/index.js"></script>
+</body>
+</html>

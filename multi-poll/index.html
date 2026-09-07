@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+<head>
+  <meta charset="UTF-8" />
+  <title>Multi Poll Widget</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+  <script src="https://cdn.jsdelivr.net/npm/@streamerbot/client/dist/streamerbot-client.min.js"></script>
+</head>
+
+<body>
+  <div class="poll-wrapper hidden" id="poll-widget">
+    <div class="poll-card">
+      <div class="poll-timer-overlay"></div>
+      <div class="title">START A POLL</div>
+      <div class="choices"></div> <!-- JS will fill this -->
+    </div>
+  </div>
+
+  <div class="notifications"></div>
+  <script src="script.js"></script>
+</body>
+
+</html>
