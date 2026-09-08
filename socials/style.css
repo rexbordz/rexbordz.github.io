@@ -1,0 +1,232 @@
+/* Socials page. Palette, type and easings come from ../.shared/css/global.css. */
+
+@property --a { syntax: '<angle>'; inherits: false; initial-value: 0turn; }
+
+body { min-height: 100vh; }
+
+/* ── atmosphere ─────────────────────────────────────── */
+.bg, .spot { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+.bg {
+  background:
+    radial-gradient(90% 46% at 50% 0, rgba(59, 130, 246, 0.15), transparent 60%),
+    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.05) 1px, transparent 0) 0 0 / 20px 20px;
+}
+.spot {
+  opacity: 0;
+  transition: opacity 0.5s var(--ease);
+  background: radial-gradient(340px circle at var(--mx, 50%) var(--my, 40%),
+    rgba(59, 130, 246, 0.28), rgba(59, 130, 246, 0.09) 44%, transparent 70%);
+}
+/* The same dot grid, brighter and accent-tinted, revealed only where the glow lands.
+   Origin and cell size must match .bg so the lit dots sit exactly on the dim ones. */
+.spot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 1px 1px, rgba(159, 189, 242, 0.5) 1px, transparent 0) 0 0 / 20px 20px;
+  -webkit-mask: radial-gradient(300px circle at var(--mx, 50%) var(--my, 40%), #000, rgba(0, 0, 0, 0.35) 55%, transparent 72%);
+  mask: radial-gradient(300px circle at var(--mx, 50%) var(--my, 40%), #000, rgba(0, 0, 0, 0.35) 55%, transparent 72%);
+}
+body.is-near .spot { opacity: 1; }
+
+.page { position: relative; z-index: 1; max-width: 880px; margin: 0 auto; padding: 64px 24px 72px; }
+@media (max-width: 560px) { .page { padding: 44px 18px 56px; } }
+
+/* ── header ─────────────────────────────────────────── */
+.hero { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; margin-bottom: 38px; }
+
+.ring { position: relative; width: 104px; height: 104px; display: grid; place-items: center; }
+.ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px dashed rgba(59, 130, 246, 0.45);
+  animation: spin 18s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.ring img {
+  position: relative;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  display: block;
+  box-shadow: 0 8px 28px rgba(28, 63, 170, 0.4);
+}
+
+.hero h1 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(1.9rem, 5vw, 2.5rem);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+.tagline { margin: 0; max-width: 46ch; color: var(--lede); font-size: 0.98rem; text-wrap: balance; }
+
+.chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 6px; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 11px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line);
+  background: var(--raised);
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.chip.live { border-color: rgba(255, 70, 70, 0.35); background: rgba(255, 70, 70, 0.08); color: #ffb3b3; }
+.chip.live i { width: 6px; height: 6px; border-radius: 50%; background: var(--live); animation: pulse 1.6s var(--ease) infinite; }
+.chip[hidden] { display: none; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+/* ── section rule ───────────────────────────────────── */
+.rule {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 16px;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.rule::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
+.rule + .grid { margin-bottom: 30px; }
+
+/* ── tiles ──────────────────────────────────────────── */
+.grid { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 13px; }
+@media (max-width: 720px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 18px 17px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--raised);
+  overflow: hidden;
+  isolation: isolate;
+  transition: transform 0.3s var(--spring), border-color 0.3s var(--ease),
+              background 0.3s var(--ease), box-shadow 0.3s var(--ease);
+}
+/* Hover light that traces the border, tinted to the platform's colour. */
+.tile::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(from var(--a), transparent 0 0.6turn, var(--brand, var(--accent)) 0.78turn, transparent 0.95turn);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.25s var(--ease);
+  pointer-events: none;
+  z-index: 2;
+}
+.tile:hover, .tile:focus-visible {
+  transform: translateY(-4px);
+  border-color: var(--line-mid);
+  background: var(--raised-2);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+}
+.tile:hover::after, .tile:focus-visible::after { opacity: 1; animation: trace 1.6s linear infinite; }
+@keyframes trace { to { --a: 1turn; } }
+
+.ghost {
+  position: absolute;
+  right: -18px;
+  bottom: -20px;
+  width: 96px;
+  height: 96px;
+  fill: #fff;
+  opacity: 0.035;
+  z-index: 0;
+  transition: opacity 0.3s var(--ease), transform 0.45s var(--spring), fill 0.3s var(--ease);
+}
+.tile:hover .ghost { opacity: 0.15; fill: var(--brand, #fff); transform: scale(1.12) rotate(-7deg); }
+
+.mark { position: relative; z-index: 1; width: 22px; height: 22px; fill: var(--soft); transition: fill 0.3s var(--ease); }
+.tile:hover .mark { fill: var(--brand, var(--accent)); }
+
+.nm { position: relative; z-index: 1; font-size: 0.95rem; font-weight: 600; color: var(--strong); line-height: 1.3; }
+.hd {
+  position: relative;
+  z-index: 1;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.3s var(--ease);
+}
+.tile:hover .hd { color: var(--muted); }
+
+.live-dot {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  color: #ffb3b3;
+}
+.live-dot i { width: 6px; height: 6px; border-radius: 50%; background: var(--live); animation: pulse 1.6s var(--ease) infinite; }
+.live-dot[hidden] { display: none; }
+
+/* Hero tile: the stream itself gets the whole row. */
+.tile.hero-tile { grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 16px; padding: 20px; }
+.tile.hero-tile .mark { width: 30px; height: 30px; flex: none; }
+.tile.hero-tile .stack { position: relative; z-index: 1; display: flex; flex-direction: column; min-width: 0; }
+.tile.hero-tile .nm { font-family: var(--display); font-size: 1.15rem; letter-spacing: -0.01em; color: var(--ink); }
+.tile.hero-tile .ghost { right: -10px; bottom: -30px; width: 130px; height: 130px; }
+.tile.hero-tile .live-dot {
+  position: static;
+  margin-left: auto;
+  flex: none;
+  padding: 5px 11px;
+  border-radius: var(--r-pill);
+  border: 1px solid rgba(255, 70, 70, 0.35);
+  background: rgba(255, 70, 70, 0.09);
+}
+
+.tile.wide { grid-column: span 2; }
+@media (max-width: 720px) { .tile.wide { grid-column: 1 / -1; } }
+@media (max-width: 440px) {
+  .tile.hero-tile { flex-wrap: wrap; }
+  .tile.hero-tile .live-dot { margin-left: 0; }
+}
+
+/* ── footer ─────────────────────────────────────────── */
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 16px;
+  margin-top: 44px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--faint);
+}
+.foot a { color: var(--faint); transition: color 0.2s var(--ease); }
+.foot a:hover { color: var(--accent-soft); }
+.foot .dot { color: var(--line-hard); }
