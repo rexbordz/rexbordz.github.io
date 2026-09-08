@@ -1,56 +1,54 @@
-One of the things that I really like about modern Android phones is the Bubble notifications for chat and messages. I tried my best to make something like it for my stream alerts. So now let me introduce to you - Bubble Alerts. It is an alert overlay that supports Twitch, YouTube, Kick, and TikTok!
+## Requirements
 
----
+- **Streamer.bot** for Twitch, YouTube and Kick alerts
+- **Tikfinity** for TikTok alerts
 
-## **🔌 Requirements**
+## Installation
 
-<img src="https://github.com/user-attachments/assets/77ff6913-e6d7-4fe0-b9a0-bf66f5e8f745" style="height: 1em; vertical-align: middle;"> **Streamer.Bot (For Twitch, YouTube, and/or Kick)** <br>
-If you need help setting this up, visit their [website](https://streamer.bot/).
+### 1. Turn On Streamer.bot's WebSocket Server
 
-<img src="https://github.com/user-attachments/assets/3ec8eac2-17d2-4a97-a066-e55c1e29d2c5" style="height: 1em; vertical-align: middle;"> **Tikfinity (For TikTok)** <br>
-You need this to be able to listen to TikTok events. If you need help setting this up, you can check out my [Tikfinity Setup Guide](https://www.notion.so/Tikfinity-Setup-Guide-241088f4f93e8051b991c6ef4b659934?pvs=21).
+![Step 1](docs/assets/step1.png)
 
----
+### 2. Open Tikfinity (only for TikTok)
 
-## **🚀 Installation**
+Tikfinity's WebSocket server is on by default so nothing else is required beyond this.
 
-1. **Open [Streamer.bot](http://Streamer.bot) (For Twitch, YouTube or Kick)**
-    - You need to have WebSocket Server enabled:
-        
-        <img width="998" height="693" alt="image" src="https://github.com/user-attachments/assets/e6883bb1-8d0f-4f42-b581-a0b23133767a" />
+### 3. Configure Your Overlay
 
-2. **Open TikFinity (For TikTok)**
-    - I believe TikFinity’s WebSocket Server is on by default so there’s nothing else that needs to be done except for having it opened with your TikTok account logged in.
-   
-3. **Configure your alerts** - Open the [settings page](https://rexbordz.github.io/bubble-alerts/settings) in a new tab and configure your alerts
-   
-    <img width="2517" height="1317" alt="image" src="https://github.com/user-attachments/assets/359db230-8b16-4c09-8cc2-b91afcc6eec9" />
+Open the settings page by clicking `Configure this widget in the settings editor` [here](#configure-widget).
 
-4. Press the `Copy Link URL` button and add **Bubble Alerts** as a **Browser Source** to your streaming software of choice.
-       
-    <img width="1201" height="974" alt="image" src="https://github.com/user-attachments/assets/1b227120-ad08-4088-87ea-c323c0ab8a67" />
+Once in the settings page, configure the widget to your heart's desire.
 
-> [!TIP]
-> ✅ **SUCCESS!** You have successfully installed Bubble Alerts.
+### 4. Connect Your OBS to the Settings Page
 
----
+If your OBS WebSocket settings is set to default, you shouldn't have to do anything after opening the settings page. However, in case your websocket's port is different and you have a password set, you can configure it here, and then just click `Connect`.
 
-## 💝 Donate
+![Step 4](docs/assets/step4.png)
 
-Your donations help me create better content and improve stream quality! If you'd like to support my work and see more of it, you can donate through the following:
+### 5. Add the Browser Source to OBS
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/M4M3C7R1J)
+There are 2 ways to accomplish this:
 
----
+- **Method 1 (Recommended)**
 
-## 📞 Support
+  Click `Add New Source to OBS`, pick the **Scene**, set a **Source name**, and then click `Create & Load`
 
-For technical support or inquiries, please contact me through my Discord channel:
+  ![Step 5](docs/assets/step5.png)
 
-- <img src="https://github.com/user-attachments/assets/99e66009-11f1-4bcc-a06f-aa5c2f90524a" style="height: 1.5em;"> **[Discord Server](https://discord.gg/pJWEPzbdfa)**
+- **Method 2 (Traditional and Familiar)**
 
-    You can ask questions in the [🗨️❓│support forum](https://discord.com/channels/789352409473875988/1327979423835623464) or  [#❓│support channel](https://discord.com/channels/789352409473875988/800788710789742622)
-    
-- 🐞 **Bug Reports**
-    
-    Post any bug reports in the [#🐞│bug-reports channel](https://discord.com/channels/789352409473875988/1317386476501205044) in my discord page
+  Click the `Copy Current Settings URL` button and manually add the browser source into your OBS.
+
+  ![Step 5b](docs/assets/step5b.png)
+
+  ![Step 5ba](docs/assets/step5ba.png)
+
+## Editing an Existing Browser Source
+
+The settings page is programmed to detect any live browser source of the widget. To edit any existing one, just load that browser source by following the steps in the screenshot.
+
+![Edit 1](docs/assets/Edit1.png)
+
+When you're done editing the settings, just click `Save to Source` and it will automatically update the browser source in OBS.
+
+![Edit 2](docs/assets/Edit2.png)
