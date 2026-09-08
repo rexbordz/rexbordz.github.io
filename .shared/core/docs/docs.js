@@ -286,6 +286,15 @@
     });
   }
 
+  // Links leave the page, so they open in a new tab; in-page anchors stay put.
+  function externalize(root) {
+    root.querySelectorAll('a[href]').forEach(function (a) {
+      if (a.getAttribute('href').charAt(0) === '#') return;
+      a.target = '_blank';
+      a.rel = 'noopener';
+    });
+  }
+
   function lightbox(root) {
     var box = el('<div class="lightbox"><button class="lightbox-close" type="button" aria-label="Close">' +
       svg(ICON.close, { size: 20, stroke: '#d4d4d4', width: 2 }) + '</button><img alt=""></div>');
@@ -295,6 +304,8 @@
     var close = function () { box.classList.remove('is-open'); };
 
     root.querySelectorAll('img').forEach(function (im) {
+      // A linked image follows its link instead of zooming.
+      if (im.closest('a')) return;
       im.addEventListener('click', function () {
         full.src = im.currentSrc || im.src;
         full.alt = im.alt || '';
@@ -480,6 +491,8 @@
   var article = el('<article class="doc-body"></article>');
   wrap.appendChild(article);
 
+  externalize(wrap);
+
   wrap.querySelector('.install-copy').addEventListener('click', function () {
     copy(this.dataset.url, this);
   });
@@ -503,6 +516,7 @@
       upgradeTables(article);
       buildRail(article);
       lightbox(article);
+      externalize(article);
 
       wrap.appendChild(buildFooter());
 

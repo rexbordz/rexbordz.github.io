@@ -713,6 +713,7 @@ a:hover { color: var(--accent-pale); text-decoration: underline; }
 
 /* ── image lightbox ─────────────────────────────────── */
 .doc-body img { cursor: zoom-in; }
+.doc-body a img { cursor: pointer; }
 
 .lightbox {
   position: fixed;
