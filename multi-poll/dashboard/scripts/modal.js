@@ -1,6 +1,11 @@
 // dashboard/modal.js — connection modal + Streamer.bot integration-check modal (both <wa-dialog>s in index.html).
 
-import { STREAM_DECK_IMPORT_CODE } from "./stream-deck-import-code.js";
+const IMPORT_CODE_URL =
+  "https://raw.githubusercontent.com/rexbordz/rexbordz.github.io/refs/heads/main/multi-poll/import.sb";
+const IMPORT_CODE_BLOB_URL =
+  "https://github.com/rexbordz/rexbordz.github.io/blob/main/multi-poll/import.sb";
+
+let importCodePromise = null;
 
 const REQUIRED_ACTIONS = [
   { id: "8413040f-ee21-439d-be53-b44f55d35998", name: "MultiPoll • [SD] Clear" },
@@ -38,9 +43,6 @@ export function createConnectionUI({ getConnection, loadConnectionSettings }) {
   const codeBox = sbActionsDialog.querySelector("#codeBox");
   const importCopyBtn = sbActionsDialog.querySelector("#import-copy-btn");
   const recheckBtn = sbActionsDialog.querySelector("#integration-recheck-btn");
-
-  codeBox.textContent = STREAM_DECK_IMPORT_CODE;
-  importCopyBtn.value = STREAM_DECK_IMPORT_CODE;
 
   // =============================
   // Status Indicator
@@ -115,6 +117,32 @@ export function createConnectionUI({ getConnection, loadConnectionSettings }) {
   // =============================
   // Integration-Check Modal
   // =============================
+
+  // Read straight from import.sb so the code here never goes stale.
+  async function showImportCode() {
+    codeBox.textContent = "Loading import code…";
+    importCopyBtn.disabled = true;
+
+    importCodePromise ??= fetch(IMPORT_CODE_URL)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.text();
+      })
+      .then((text) => text.trim());
+
+    try {
+      const code = await importCodePromise;
+      codeBox.textContent = code;
+      importCopyBtn.value = code;
+      importCopyBtn.disabled = false;
+    } catch (err) {
+      console.error("Failed to load import code:", err);
+      importCodePromise = null; // let the next open retry
+      codeBox.innerHTML =
+        `Couldn't load the import code. <a href="${IMPORT_CODE_BLOB_URL}" ` +
+        `target="_blank" rel="noopener noreferrer">Get it on GitHub</a>`;
+    }
+  }
 
   function buildActionLookup(streamerbotActions) {
     actionLookup.clear();
@@ -223,6 +251,7 @@ export function createConnectionUI({ getConnection, loadConnectionSettings }) {
 
     renderActionsList();
     refreshIntegrationDisplay();
+    showImportCode();
 
     document.body.classList.add("modal-open");
     sbActionsDialog.open = true;
