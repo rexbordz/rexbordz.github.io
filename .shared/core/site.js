@@ -21,7 +21,7 @@ window.SITE = {
 
   // Hero support buttons on the homepage. `icon` is a MARK key from chrome.js.
   support: [
-    { label: 'Join Patreon', href: 'https://www.patreon.com/rexbordz/', icon: 'patreon', color: 'var(--patreon)' },
+    { label: 'Join Patreon', href: 'https://www.patreon.com/rexbordz/membership/', icon: 'patreon', color: 'var(--patreon)' },
     { label: 'Ko-fi', href: 'https://ko-fi.com/rexbordz/', icon: 'kofi', color: 'var(--kofi)' },
   ],
 
