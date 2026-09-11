@@ -358,13 +358,31 @@
   position: fixed;
   inset: 0;
   z-index: 100;
-  display: none;
+  display: flex;
   justify-content: center;
   padding: 12vh 20px 20px;
   background: rgba(8, 8, 8, 0.72);
-  backdrop-filter: blur(3px);
+  /* Closed state. visibility (not display) so both directions can animate. */
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  backdrop-filter: blur(0px);
+  transition: opacity 0.18s var(--ease), backdrop-filter 0.18s var(--ease), visibility 0s 0.18s;
 }
-.search-modal.is-open { display: flex; }
+.search-modal.is-open {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  backdrop-filter: blur(3px);
+  transition: opacity 0.18s var(--ease), backdrop-filter 0.18s var(--ease), visibility 0s;
+}
+.search-panel { transform: scale(0.94); opacity: 0; transition: transform 0.18s var(--ease), opacity 0.18s var(--ease); }
+.search-modal.is-open .search-panel { transform: scale(1); opacity: 1; transition-timing-function: var(--spring); }
+
+@media (prefers-reduced-motion: reduce) {
+  .search-modal, .search-panel { transition-duration: 0.01s; }
+  .search-panel { transform: none; }
+}
 
 .search-panel {
   width: 100%;
