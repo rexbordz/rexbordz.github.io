@@ -118,6 +118,17 @@ body.panel-resizing .preview-panel iframe {
   padding: 18px 24px 100px;
 }
 
+.widget-logo-link {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  transition: opacity 0.2s ease;
+}
+
+.widget-logo-link:hover {
+  opacity: 0.75;
+}
+
 .widget-logo {
   height: 2rem;
   width: auto;
@@ -850,10 +861,20 @@ a {
   gap: 16px;
 
   width: 100%;
-  padding: 12px 20px;
+  height: 64px;
+  padding: 0 20px;
 
-  background: #141414;
+  /* Matches .site-header in .shared/css/chrome.css so headers read the same
+     site-wide; values are literal because this page does not load global.css. */
+  background: rgba(20, 20, 20, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid #272727;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 720px) {
+  .app-header { height: 56px; padding: 0 16px; }
 }
 
 /* The global `button` rule sets width:100% / margin-top:15px — undo in header. */

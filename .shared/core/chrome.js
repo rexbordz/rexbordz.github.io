@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  var site = window.DOCS_SITE || {};
+  var site = window.SITE || {};
   var catalog = window.CATALOG || [];
 
   // This file lives at <root>/.shared/core/, so every shared path resolves from
@@ -33,6 +33,7 @@
   // Filled marks, drawn rather than stroked.
   var MARK = {
     patreon: '<path d="M7.462 3.1c2.615-1.268 6.226-1.446 9.063-.503c2.568.853 4.471 3.175 4.475 5.81c.004 3.061-1.942 5.492-4.896 6.243c-1.693.43-2.338.75-2.942 1.582c-.238.328-.45.745-.796 1.533l-.22.5C11 20.866 9.99 22.027 7.91 22c-2.232-.03-3.603-1.742-4.313-4.48c-.458-1.768-.617-3.808-.594-5.876c.044-3.993 1.42-7.072 4.46-8.545z"></path>',
+    kofi: '<path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.062 3.511c-1.246 1.453-4.011 3.976-4.011 3.976s-.121.119-.31.023c-.076-.057-.108-.09-.108-.09-.443-.441-3.368-3.049-4.034-3.954-.709-.965-1.041-2.7-.091-3.71.951-1.01 3.005-1.086 4.363.407 0 0 1.565-1.782 3.468-.963 1.904.82 1.832 3.011.723 4.311zm6.173.478c-.928.116-1.682.028-1.682.028V7.284h1.77s1.971.551 1.971 2.638c0 1.913-.985 2.667-2.059 3.015z"></path>',
     discord: '<path d="M19.9 5.2A17.3 17.3 0 0 0 15.6 3.9l-.2.4a16 16 0 0 1 3.8 1.2 15.4 15.4 0 0 0-13 0 16 16 0 0 1 3.8-1.2l-.2-.4A17.3 17.3 0 0 0 5.5 5.2C2.8 9.3 2 13.3 2.4 17.2A17.4 17.4 0 0 0 7.7 19.8l1-1.7a11.3 11.3 0 0 1-1.8-.8l.4-.4a12.5 12.5 0 0 0 10.6 0l.4.4a11.3 11.3 0 0 1-1.8.8l1 1.7a17.4 17.4 0 0 0 5.3-2.6c.5-4.6-.7-8.6-3-12zM9 14.7c-1 0-1.9-.9-1.9-2.1S8 10.5 9 10.5s1.9.9 1.9 2.1-.8 2.1-1.9 2.1zm5 0c-1 0-1.9-.9-1.9-2.1s.9-2.1 1.9-2.1 1.9.9 1.9 2.1-.8 2.1-1.9 2.1z"></path>'
   };
 
@@ -255,8 +256,11 @@
     function move(target, animate) {
       var nr = nav.getBoundingClientRect();
       var r = target.getBoundingClientRect();
-      var left = r.left - nr.left;
-      var right = nr.right - r.right;
+      // Links pad themselves out to kill dead space between hit areas; inset by
+      // that padding so the bar still hugs the label.
+      var cs = getComputedStyle(target);
+      var left = r.left - nr.left + parseFloat(cs.paddingLeft);
+      var right = nr.right - r.right + parseFloat(cs.paddingRight);
       var was = parseFloat(bar.style.left);
       var goingRight = !isNaN(was) && left > was;
 

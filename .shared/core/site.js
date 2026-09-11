@@ -1,7 +1,7 @@
 /* Site-wide chrome config. Every page reads this — change it here, not per page.
    Paths are relative to the site root; CHROME.root() resolves them, so nothing
    here is tied to how deep the page lives. */
-window.DOCS_SITE = {
+window.SITE = {
   brand: 'rexbordz',
   logo: '.shared/assets/images/rexbordz-blue-and-white-gradient-logo.png',
 
@@ -17,6 +17,12 @@ window.DOCS_SITE = {
   links: [
     { label: 'GitHub', href: 'https://github.com/rexbordz', icon: 'github' },
     { label: 'Patreon', href: 'https://www.patreon.com/rexbordz', icon: 'patreon' },
+  ],
+
+  // Hero support buttons on the homepage. `icon` is a MARK key from chrome.js.
+  support: [
+    { label: 'Join Patreon', href: 'https://www.patreon.com/rexbordz/', icon: 'patreon', color: 'var(--patreon)' },
+    { label: 'Ko-fi', href: 'https://ko-fi.com/rexbordz/', icon: 'kofi', color: 'var(--kofi)' },
   ],
 
   // Footer marks. YouTube is the tech channel — the gaming one is a different

@@ -5,7 +5,7 @@
   'use strict';
 
   var C = window.CHROME;
-  var site = window.DOCS_SITE || {};
+  var site = window.SITE || {};
   var boot = JSON.parse(document.getElementById('docsBoot').textContent);
   var entry = (C && C.entry(boot.id)) || {};
 

@@ -94,7 +94,11 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 26px;
+  gap: 0;
+  /* The 26px that used to be `gap` now lives inside each link as padding, so the
+     hit areas touch with no dead space; the negative margin keeps the row's
+     visual edges where they were. */
+  margin: 0 -13px;
   font-size: 0.88rem;
   font-weight: 500;
 }
@@ -102,7 +106,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 0;
+  padding: 0 13px;
   border: none;
   background: none;
   font: inherit;

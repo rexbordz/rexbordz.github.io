@@ -19,7 +19,7 @@
   var PLAT_LOGO = {
     twitch: ['twitch/logo-twitch.svg', 19],
     youtube: ['youtube/logo-youtube.svg', 21],
-    kick: ['kick/logo-kick.png', 19],
+    kick: ['kick/logo-kick.svg', 19],
     tiktok: ['tiktok/logo-tiktok.svg', 19]
   };
 
@@ -103,6 +103,12 @@
         C.esc(C.root('.shared/assets/images/' + spec[0])) + '" alt="">' + C.esc(label) + '</span>';
     }).join('');
 
+    // Patreon and Ko-fi, declared in site.js so the hero stays markup-only.
+    var support = (site.support || []).map(function (b) {
+      return '<a class="btn btn-brand" style="--brand:' + b.color + '" href="' + C.esc(b.href) + '" ' +
+        'target="_blank" rel="noopener">' + C.mark(b.icon, { size: 17, fill: b.color }) + C.esc(b.label) + '</a>';
+    }).join('');
+
     return '<section class="hero">' +
       '<div class="eyebrow">' + C.esc(boot.eyebrow) + '</div>' +
       '<h1>' + C.esc(boot.title) + '</h1>' +
@@ -110,16 +116,24 @@
       '<div class="cta-row">' +
         '<a class="btn btn-primary" href="#widgets">Browse widgets' +
           C.svg(C.ICON.arrow, { size: 17, stroke: '#fff', width: 2.4 }) + '</a>' +
-        (site.discord
-          ? '<a class="btn btn-ghost" href="' + C.esc(site.discord) + '" target="_blank" rel="noopener">' +
-            C.mark('discord', { size: 17, fill: '#5865f2' }) + 'Join the Discord</a>'
-          : '') +
+        support +
       '</div>' +
       '<div class="runs-on"><span style="color:inherit">Runs on</span>' + runs + '</div>' +
     '</section>';
   }
 
   /* ── render ─────────────────────────────────────────── */
+
+  // A fresh visit opens on the hero alone; once expanded it stays that way for
+  // the session, so coming back from a docs page does not replay the landing.
+  // 404.html runs this same script and promises the widgets are below it, so the
+  // landing is for the homepage only — at '/' or at '/index.html'.
+  var opened;
+  try { opened = sessionStorage.getItem('home-open'); } catch (e) {}
+  var isHome = location.pathname.replace(/index\.html$/, '') === new URL(C.root()).pathname;
+  if (isHome && location.hash !== '#widgets' && opened !== '1') {
+    document.documentElement.classList.add('is-landing');
+  }
 
   document.body.appendChild(C.buildHeader());
   C.slideNav(document.querySelector('.site-header'));
@@ -128,11 +142,42 @@
   var pro = C.catalog.filter(function (c) { return c.tier === 'pro'; });
 
   var main = C.el('<main class="page-wrap"></main>');
+  // The inner div is what the landing collapses to zero height; the shelves
+  // cannot do it themselves, since 0fr sizing needs a single child to measure.
   main.innerHTML = hero() +
-    shelf('widgets', 'Widgets & tools', free) +
-    // Renders nothing at all while there are no pro entries — no empty shelf.
-    shelf('exclusive', 'Patreon-exclusive', pro);
+    '<div class="shelves"><div>' +
+      shelf('widgets', 'Widgets & tools', free) +
+      // Renders nothing at all while there are no pro entries — no empty shelf.
+      shelf('exclusive', 'Patreon-exclusive', pro) +
+    '</div></div>';
   document.body.appendChild(main);
 
   main.appendChild(C.buildSiteFooter());
+
+  // Browse widgets and the header's Widgets tab both point at #widgets. From the
+  // landing they expand the page instead of navigating; the hero collapsing is
+  // what brings the grid into view, so there is no scroll to run. Registering
+  // before nav.js means preventDefault also calls off its hold-and-warm.
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href$="#widgets"]');
+    if (!a || !document.documentElement.classList.contains('is-landing')) return;
+    e.preventDefault();
+    var root = document.documentElement;
+    root.classList.remove('is-landing');
+    // Keeps the shelves clipped while they grow; dropped afterwards so the top
+    // row's hover lift is not cut off.
+    root.classList.add('is-opening');
+    setTimeout(function () { root.classList.remove('is-opening'); }, 560);
+    try { sessionStorage.setItem('home-open', '1'); } catch (err) {}
+    history.replaceState(null, '', '#widgets');
+  });
+
+  // Arriving on #widgets from elsewhere: the browser's own hash scroll already
+  // ran, before this script had put a grid on the page.
+  if (location.hash === '#widgets') {
+    requestAnimationFrame(function () {
+      var t = document.getElementById('widgets');
+      if (t) t.scrollIntoView();
+    });
+  }
 })();

@@ -68,7 +68,7 @@
   var PLATFORMS = {
     twitch:  { icon: LOGOS + "twitch/logo-twitch.svg",   mark: "T",  bg: "#9146ff", fg: "#ffffff" },
     youtube: { icon: LOGOS + "youtube/logo-youtube.svg", mark: "Y",  bg: "#ff0033", fg: "#ffffff" },
-    kick:    { icon: LOGOS + "kick/logo-kick.png",       mark: "K",  bg: "#53fc18", fg: "#0b1a00" },
+    kick:    { icon: LOGOS + "kick/logo-kick.svg",       mark: "K",  bg: "#53fc18", fg: "#0b1a00" },
     tiktok:  { icon: LOGOS + "tiktok/logo-tiktok.svg",   mark: "TT", bg: "#111318", fg: "#25f4ee" }
   };
 

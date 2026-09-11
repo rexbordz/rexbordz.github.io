@@ -1,10 +1,36 @@
 /* Homepage: the hero and the card grid. Header, footer and the search modal
    come from ../../css/chrome.css. Loads after global.css + atmosphere.css. */
 
-.page-wrap { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+/* Flex in both states: justify-content only has free space to distribute while
+   min-height is holding the box open, so the landing and the ordinary page are
+   the same layout, and opening one into the other is a single animated length.
+   min-height must be 0 rather than auto here — auto cannot be interpolated, and
+   a transition into it snaps. */
+.page-wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+  transition: min-height 0.55s var(--ease);
+}
 
 /* ── hero ───────────────────────────────────────────── */
-.hero { padding: 92px 0 78px; max-width: 780px; }
+.hero {
+  padding: 92px 0 78px;
+  max-width: 780px;
+  transition: padding 0.55s var(--ease);
+}
+.hero > * { animation: rise 0.6s var(--ease) both; }
+.hero > *:nth-child(2) { animation-delay: 0.09s; }
+.hero > *:nth-child(3) { animation-delay: 0.18s; }
+.hero > *:nth-child(4) { animation-delay: 0.27s; }
+.hero > *:nth-child(5) { animation-delay: 0.36s; }
+@keyframes rise { from { opacity: 0; transform: translateY(16px); } }
 .hero .eyebrow {
   font-family: var(--mono);
   font-size: 0.7rem;
@@ -22,6 +48,7 @@
   color: var(--ink);
   margin: 0 0 22px;
   text-wrap: balance;
+  transition: font-size 0.55s var(--ease);
 }
 .hero p {
   font-size: 1.16rem;
@@ -55,6 +82,17 @@
 .btn-primary:hover { box-shadow: 0 10px 28px rgba(28, 63, 170, 0.55); }
 .btn-ghost { border: 1px solid var(--line-mid); background: var(--tab); color: var(--strong); }
 .btn-ghost:hover { border-color: var(--line-hard); background: #1f1f1f; color: var(--strong); }
+/* Patreon and Ko-fi. --brand is set inline from site.js. */
+.btn-brand {
+  border: 1px solid color-mix(in srgb, var(--brand) 38%, transparent);
+  background: color-mix(in srgb, var(--brand) 12%, var(--tab));
+  color: var(--strong);
+}
+.btn-brand:hover {
+  border-color: var(--brand);
+  background: color-mix(in srgb, var(--brand) 20%, var(--tab));
+  color: var(--ink);
+}
 
 .runs-on {
   display: flex;
@@ -218,6 +256,49 @@
 .tile-go:hover { color: var(--brand); text-decoration: none; }
 .tile:hover .tile-go { color: var(--brand); }
 
+/* ── landing ────────────────────────────────────────── */
+/* A fresh homepage is the hero and the footer, centred together as one group on
+   a single screen with the shelves closed to nothing between them. Browse widgets
+   drops .is-landing: the page stops being held open, the shelves grow, and the
+   group rises to the top as the free space around it runs out. No rule here sets
+   a layout mode or a keyword — every one of them is a length that interpolates. */
+.is-landing .page-wrap { min-height: calc(100vh - var(--header-h)); }
+.is-landing .hero { padding: 0 0 28px; }
+.is-landing .hero h1 { font-size: clamp(3.6rem, 6.4vw, 5rem); }
+
+/* The shelves grow open from nothing rather than hiding in place, so everything
+   below them keeps its position in the flow. 0fr → 1fr animates to the content's
+   own height, which no max-height guess can do. The clip is only needed while
+   that runs — left on, it would cut the top row's hover lift. */
+.shelves {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.55s var(--ease);
+}
+.shelves > div { min-height: 0; }
+.is-landing .shelves { grid-template-rows: 0fr; }
+.is-landing .shelves > div, .is-opening .shelves > div { overflow: hidden; }
+
+.shelf {
+  transition: opacity 0.5s var(--ease) 0.12s, transform 0.5s var(--ease) 0.12s, visibility 0s;
+}
+.is-landing .shelf {
+  opacity: 0;
+  transform: translateY(20px);
+  visibility: hidden;
+  transition-delay: 0s, 0s, 0.55s;
+}
+
+/* The footer never leaves the flow. On the landing the shelves above it have no
+   height, so it comes to rest directly under the hero, one screen down; opening
+   them slides it to the bottom of the page. Its rule stays out of the way until
+   there is something above it worth dividing. */
+.site-footer {
+  animation: rise 0.6s var(--ease) 0.45s both;
+  transition: margin-top 0.55s var(--ease), border-color 0.55s var(--ease);
+}
+.is-landing .site-footer { margin-top: 0; border-top-color: transparent; }
+
 /* ── narrow ─────────────────────────────────────────── */
 @media (max-width: 860px) {
   .page-wrap { padding: 0 18px; }
@@ -226,5 +307,7 @@
   .hero p { font-size: 1rem; }
   .cta-row { flex-direction: column; align-items: stretch; }
   .btn { justify-content: center; height: 48px; }
+  .is-landing .hero { padding-bottom: 24px; }
+  .is-landing .hero h1 { font-size: 2.9rem; }
   .grid { grid-template-columns: 1fr; }
 }
