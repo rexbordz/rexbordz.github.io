@@ -1,34 +1,29 @@
 /* Docs core: fetch a widget's README.md, render it, and build the page around it.
-   Per-widget config comes from the #docsBoot JSON block in the shim. */
+   The shim carries only an id — title, eyebrow, platforms and URLs all come
+   from catalog.js, so a widget is described in exactly one place. */
 (function () {
   'use strict';
 
+  var C = window.CHROME;
   var site = window.DOCS_SITE || {};
   var boot = JSON.parse(document.getElementById('docsBoot').textContent);
+  var entry = (C && C.entry(boot.id)) || {};
 
-  var ICON = {
-    github: 'M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22',
-    heart: 'M12 21s-7.5-4.6-9.6-9A5.4 5.4 0 0 1 12 6.5 5.4 5.4 0 0 1 21.6 12c-2.1 4.4-9.6 9-9.6 9z',
-    search: 'M21 21l-4.3-4.3',
-    link: 'M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7',
-    copy: 'M5 15V5a2 2 0 0 1 2-2h10',
-    pencil: 'M11 4H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-6M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z',
-    list: 'M4 7h10M4 12h16M4 17h7',
-    close: 'M6 6l12 12M18 6L6 18'
-  };
+  // Catalog supplies the defaults; anything set inline in the shim still wins.
+  ['eyebrow', 'version', 'lede', 'platforms'].forEach(function (k) {
+    if (boot[k] === undefined && entry[k] !== undefined) boot[k] = entry[k];
+  });
+  if (boot.title === undefined) boot.title = entry.name || '';
+  if (!boot.source && entry.widgetUrl) boot.source = C.root(entry.widgetUrl + 'README.md');
+  if (!boot.widgetUrl && entry.widgetUrl) boot.widgetUrl = C.root(entry.widgetUrl);
+  if (!boot.settingsUrl && entry.settingsUrl) boot.settingsUrl = C.root(entry.settingsUrl);
+  if (!boot.breadcrumb) boot.breadcrumb = ['Docs', boot.title];
 
-  // Filled marks, drawn rather than stroked.
-  var MARK = {
-    patreon: '<path d="M7.462 3.1c2.615-1.268 6.226-1.446 9.063-.503c2.568.853 4.471 3.175 4.475 5.81c.004 3.061-1.942 5.492-4.896 6.243c-1.693.43-2.338.75-2.942 1.582c-.238.328-.45.745-.796 1.533l-.22.5C11 20.866 9.99 22.027 7.91 22c-2.232-.03-3.603-1.742-4.313-4.48c-.458-1.768-.617-3.808-.594-5.876c.044-3.993 1.42-7.072 4.46-8.545z"></path>',
-    discord: '<path d="M19.9 5.2A17.3 17.3 0 0 0 15.6 3.9l-.2.4a16 16 0 0 1 3.8 1.2 15.4 15.4 0 0 0-13 0 16 16 0 0 1 3.8-1.2l-.2-.4A17.3 17.3 0 0 0 5.5 5.2C2.8 9.3 2 13.3 2.4 17.2A17.4 17.4 0 0 0 7.7 19.8l1-1.7a11.3 11.3 0 0 1-1.8-.8l.4-.4a12.5 12.5 0 0 0 10.6 0l.4.4a11.3 11.3 0 0 1-1.8.8l1 1.7a17.4 17.4 0 0 0 5.3-2.6c.5-4.6-.7-8.6-3-12zM9 14.7c-1 0-1.9-.9-1.9-2.1S8 10.5 9 10.5s1.9.9 1.9 2.1-.8 2.1-1.9 2.1zm5 0c-1 0-1.9-.9-1.9-2.1s.9-2.1 1.9-2.1 1.9.9 1.9 2.1-.8 2.1-1.9 2.1z"></path>'
-  };
+  // The shim's <title> is a generic no-JS fallback; the real one is the widget's.
+  if (boot.title) document.title = boot.title + ' — Install Guide';
 
-  function mark(name, opts) {
-    opts = opts || {};
-    var size = opts.size || 18;
-    return '<svg class="' + (opts.cls || '') + '" width="' + size + '" height="' + size + '" ' +
-      'viewBox="0 0 24 24" fill="' + (opts.fill || 'currentColor') + '" stroke="none">' + MARK[name] + '</svg>';
-  }
+  var ICON = C.ICON, PLATFORM = C.PLATFORM;
+  var svg = C.svg, mark = C.mark, el = C.el, esc = C.esc;
 
   var ALERT = {
     NOTE: { cls: 'note', stroke: '#3b82f6', path: 'M12 11v5M12 8h.01', circle: true },
@@ -37,87 +32,6 @@
     WARNING: { cls: 'warning', stroke: '#ef4444', path: 'M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01' },
     CAUTION: { cls: 'caution', stroke: '#ef4444', path: 'M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01' }
   };
-
-  var PLATFORM = {
-    twitch: ['Twitch', '#9146ff'],
-    youtube: ['YouTube', '#ff0033'],
-    tiktok: ['TikTok', '#25f4ee'],
-    kick: ['Kick', '#53fc18']
-  };
-
-  function svg(path, opts) {
-    opts = opts || {};
-    var size = opts.size || 16;
-    var extra = opts.circle ? '<circle cx="12" cy="12" r="9"></circle>' : '';
-    return '<svg class="' + (opts.cls || '') + '" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" ' +
-      'fill="none" stroke="' + (opts.stroke || '#8b8b8b') + '" stroke-width="' + (opts.width || 1.8) + '" ' +
-      'stroke-linecap="round" stroke-linejoin="round">' + extra + '<path d="' + path + '"></path></svg>';
-  }
-
-  function el(html) {
-    var t = document.createElement('template');
-    t.innerHTML = html.trim();
-    return t.content.firstElementChild;
-  }
-
-  function esc(s) {
-    return String(s).replace(/[&<>"]/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
-    });
-  }
-
-  /* ── chrome ─────────────────────────────────────────── */
-
-  function buildHeader() {
-    var nav = (site.nav || []).map(function (n) {
-      if (n.soon) {
-        return '<span class="nav-link is-soon" data-tooltip="Coming Soon">' + esc(n.label) + '</span>';
-      }
-      return '<a class="nav-link' + (n.active ? ' is-active' : '') + '" href="' + esc(n.href) + '">' +
-        esc(n.label) + '</a>';
-    }).join('');
-
-    var links = (site.links || []).map(function (l) {
-      var glyph = MARK[l.icon]
-        ? mark(l.icon, { size: 18, cls: "hdr-icon is-filled" })
-        : svg(ICON[l.icon] || ICON.link, { size: 19, cls: "hdr-icon", width: 2.2 });
-      return '<a href="' + esc(l.href) + '" target="_blank" rel="noopener" aria-label="' +
-        esc(l.label) + '" data-tooltip="' + esc(l.label) + '">' + glyph + '</a>';
-    }).join('');
-
-    var help = site.discord
-      ? '<div class="help-wrap">' +
-          '<button class="help-pill" type="button">' + mark("discord", { size: 16, fill: "#fff" }) +
-            '<span>Need help?</span></button>' +
-          '<div class="help-pop">' +
-            '<h4>Stuck on something?</h4>' +
-            '<p>Open a thread in the support channels on my Discord. ' +
-            'Include the widget name and what you have tried so far.</p>' +
-            '<a class="help-cta" href="' + esc(site.discord) + '" target="_blank" rel="noopener">' +
-              mark("discord", { size: 16, fill: "#fff" }) + 'Join the Discord</a>' +
-          '</div>' +
-        '</div>'
-      : '';
-
-    return el(
-      '<header class="site-header">' +
-        '<div class="brand">' +
-          '<img src="' + esc(site.logo || '') + '" alt="">' +
-          '<span>' + esc(site.brand || '') + '</span>' +
-        '</div>' +
-        '<nav class="site-nav">' + nav + '<span class="nav-bar"></span></nav>' +
-        '<div class="header-spacer"></div>' +
-        '<div class="header-actions">' + links +
-          '<div class="header-divider"></div>' +
-          '<button class="search-pill" type="button">' +
-            svg("M21 21l-4.3-4.3", { size: 14, stroke: "#fff", width: 2 })
-              .replace("<path", '<circle cx="11" cy="11" r="7"></circle><path') +
-            '<span class="search-text">Search</span><kbd>/</kbd>' +
-          '</button>' + help +
-        '</div>' +
-      '</header>'
-    );
-  }
 
   function buildHero() {
     var chips = (boot.platforms || []).map(function (p) {
@@ -157,6 +71,27 @@
         '</div>' +
       '</div>'
     );
+  }
+
+  // Widgets keep their Streamer.bot actions in <widget>/import.sb; when one is
+  // there, the hero gets a second copy box beside the browser source URL.
+  function buildImportCard(code) {
+    var preview = code.length > 220 ? code.slice(0, 220) + '…' : code;
+    var card = el(
+      '<div class="install-card is-sb" id="import-code">' +
+        '<div class="install-label">' + svg(ICON.bolt, { size: 15, stroke: '#c9a5ff' }) + 'Streamer.bot import code</div>' +
+        '<div class="install-row">' +
+          '<div class="install-url">' + esc(preview) + '</div>' +
+          '<button class="install-copy" type="button">' +
+            svg(ICON.copy, { size: 15, stroke: '#fff' }).replace('<path', '<rect x="9" y="9" width="12" height="12" rx="2"></rect><path') +
+            '<span>Copy</span></button>' +
+        '</div>' +
+      '</div>'
+    );
+    card.querySelector('.install-copy').addEventListener('click', function () {
+      copy(code, this);
+    });
+    return card;
   }
 
   function buildFooter() {
@@ -232,8 +167,8 @@
         h.after(body);
       }
 
-      var slug = h.textContent.toLowerCase().trim()
-        .replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
+      // Same slug function search.js uses, so its deep links land correctly.
+      var slug = C.slugify(h.textContent);
       if (seen[slug]) slug += '-' + (++seen[slug]); else seen[slug] = 1;
       h.id = slug;
 
@@ -442,35 +377,6 @@
     sync();
   }
 
-  // One bar for the whole nav; the leading edge moves faster, so it stretches between tabs.
-  function slideNav(header) {
-    var nav = header.querySelector('.site-nav');
-    var bar = nav && nav.querySelector('.nav-bar');
-    if (!nav || !bar) return;
-
-    var links = Array.prototype.slice.call(nav.querySelectorAll('.nav-link'));
-    var active = nav.querySelector('.nav-link.is-active') || links[0];
-    if (!active) return;
-
-    function move(target, animate) {
-      var nr = nav.getBoundingClientRect();
-      var r = target.getBoundingClientRect();
-      var left = r.left - nr.left;
-      var right = nr.right - r.right;
-      var was = parseFloat(bar.style.left);
-      var goingRight = !isNaN(was) && left > was;
-
-      bar.style.transitionDuration = animate === false ? '0s' : (goingRight ? '0.42s, 0.26s' : '0.26s, 0.42s');
-      bar.style.left = left + 'px';
-      bar.style.right = right + 'px';
-    }
-
-    move(active, false);
-    links.forEach(function (l) { l.addEventListener('pointerenter', function () { move(l); }); });
-    nav.addEventListener('pointerleave', function () { move(active); });
-    window.addEventListener('resize', function () { move(active, false); });
-  }
-
   /* ── boot ───────────────────────────────────────────── */
 
   function fail(msg) {
@@ -480,9 +386,9 @@
     ));
   }
 
-  var header = buildHeader();
+  var header = C.buildHeader();
   document.body.appendChild(header);
-  slideNav(header);
+  C.slideNav(header);
 
   var wrap = el('<main class="doc-wrap"></main>');
   document.body.appendChild(wrap);
@@ -496,6 +402,18 @@
   wrap.querySelector('.install-copy').addEventListener('click', function () {
     copy(this.dataset.url, this);
   });
+
+  var importUrl = boot.importUrl || new URL('import.sb', new URL(boot.widgetUrl || '../', location.href)).href;
+  fetch(importUrl)
+    .then(function (r) { return r.ok ? r.text() : null; })
+    .then(function (code) {
+      // A missing file can come back as the host's 404 page, so require an .sb payload.
+      if (!code || /^\s*</.test(code)) return;
+      var card = buildImportCard(code.trim());
+      wrap.querySelector('.install-card').after(card);
+      if (location.hash === '#' + card.id) card.scrollIntoView();
+    })
+    .catch(function () {});
 
   fetch(boot.source)
     .then(function (r) {

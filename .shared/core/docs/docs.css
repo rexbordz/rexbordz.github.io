@@ -1,33 +1,7 @@
 /* Docs theme. Palette matches the widget settings core; type is the docs' own. */
 :root {
-  --page: #101010;
-  --header: rgba(20, 20, 20, 0.82);
-  --raised: #161616;
-  --raised-2: #181818;
-  --tab: #1b1b1b;
-  --line: #272727;
-  --line-soft: #232323;
-  --line-mid: #2f2f2f;
-  --line-hard: #3d3d3d;
-
-  --ink: #fff;
-  --body: #c9c9c9;
-  --lede: #a8a8a8;
-  --soft: #b6b6b6;
-  --muted: #8b8b8b;
-  --faint: #5c5c5c;
-  --strong: #e4e4e4;
-
-  --accent: #3b82f6;
-  --accent-deep: #1c3faa;
-  --accent-soft: #7fa6e6;
-  --accent-pale: #9fbdf2;
-  --accent-ink: #cfe0ff;
-
-  --sans: 'Inter', system-ui, sans-serif;
-  --display: 'Space Grotesk', system-ui, sans-serif;
-  --mono: 'JetBrains Mono', ui-monospace, monospace;
-
+  /* Everything else — palette, type, radii, easings — comes from
+     ../../css/global.css, which every page that wears the chrome must load. */
   --col: 764px;
   --header-h: 64px;
 }
@@ -50,110 +24,8 @@ a { color: var(--accent-soft); text-decoration: none; }
 a:hover { color: var(--accent-pale); text-decoration: underline; }
 ::selection { background: rgba(59, 130, 246, 0.35); }
 
-/* ── header ─────────────────────────────────────────── */
-.site-header {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  gap: 28px;
-  height: var(--header-h);
-  padding: 0 40px;
-  background: var(--header);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--line);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding: 6px 10px;
-  margin-left: -10px;
-  border-radius: 10px;
-  color: inherit;
-  transition: background 0.22s ease;
-}
-.brand { cursor: default; }
-.brand img {
-  height: 30px;
-  width: 30px;
-  object-fit: contain;
-  transition: transform 0.34s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.brand span {
-  font-family: var(--display);
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--ink);
-  letter-spacing: -0.01em;
-}
-
-.site-nav {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 26px;
-  font-size: 0.88rem;
-  font-weight: 500;
-}
-.nav-link { color: var(--muted); transition: color 0.22s ease; }
-.nav-link:hover, .nav-link.is-active { color: var(--ink); text-decoration: none; }
-
-/* One bar for the whole nav; its edges move at different speeds so it stretches between tabs. */
-.nav-bar {
-  position: absolute;
-  bottom: -22px;
-  height: 2px;
-  border-radius: 2px;
-  background: var(--accent);
-  pointer-events: none;
-  transition-property: left, right;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.header-spacer { flex-grow: 1; }
-.header-actions { display: flex; align-items: center; gap: 14px; }
-
-.hdr-icon {
-  opacity: 0.72;
-  transition: opacity 0.22s ease, stroke 0.22s ease, transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.hdr-icon:hover { opacity: 1; stroke: var(--ink); transform: translateY(-2px) scale(1.1); }
-
-.header-divider { width: 1px; height: 22px; background: var(--line-mid); }
-
-.search-pill {
-  display: flex;
-  border: none;
-  align-items: center;
-  gap: 8px;
-  height: 34px;
-  padding: 0 14px;
-  border-radius: 8px;
-  background: linear-gradient(180deg, var(--line-hard), #292929);
-  font-size: 0.84rem;
-  font-weight: 600;
-  color: var(--ink);
-  cursor: pointer;
-  transition: filter 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
-}
-.search-pill:hover {
-  filter: brightness(1.3);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
-}
-.search-pill kbd {
-  padding: 1px 6px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.08);
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  color: var(--muted);
-}
+/* Header, nav, footer and the search modal come from ../../css/chrome.css,
+   so this page and the homepage cannot drift apart. */
 
 /* ── layout ─────────────────────────────────────────── */
 .doc-wrap { max-width: var(--col); margin: 0 auto; padding: 44px 24px 96px; }
@@ -258,6 +130,16 @@ a:hover { color: var(--accent-pale); text-decoration: underline; }
   overflow-x: auto;
   white-space: nowrap;
 }
+/* Chrome lets scrollbar-width/color override the ::-webkit- rules below, and its
+   thin scrollbar keeps the arrow buttons, so those go to browsers without them. */
+@supports not selector(::-webkit-scrollbar) {
+  .install-url { scrollbar-width: thin; scrollbar-color: #3a3a3a transparent; }
+}
+.install-url::-webkit-scrollbar { height: 6px; }
+.install-url::-webkit-scrollbar-track { background: transparent; }
+.install-url::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+.install-url::-webkit-scrollbar-thumb { background: #3a3a3a; border-radius: 3px; }
+.install-url::-webkit-scrollbar-thumb:hover { background: #4d4d4d; }
 .install-copy {
   display: flex;
   align-items: center;
@@ -276,6 +158,17 @@ a:hover { color: var(--accent-pale); text-decoration: underline; }
 }
 .install-copy:hover { filter: brightness(1.1); }
 .install-copy.is-done { background: linear-gradient(180deg, #2f9e51, #1e6b36); }
+/* Streamer.bot import code — same box, purple. */
+.install-card.is-sb {
+  margin-top: 14px;
+  border-color: rgba(168, 85, 247, 0.32);
+  background: linear-gradient(180deg, rgba(168, 85, 247, 0.09), rgba(168, 85, 247, 0.02));
+}
+.install-card.is-sb .install-label { color: #c9a5ff; }
+.install-card.is-sb .install-copy { background: linear-gradient(180deg, #a855f7, #6d28d9); }
+.install-card.is-sb .install-copy.is-done { background: linear-gradient(180deg, #2f9e51, #1e6b36); }
+.install-card { scroll-margin-top: calc(var(--header-h) + 24px); }
+
 .install-links { display: flex; align-items: center; gap: 7px; margin-top: 13px; font-size: 0.82rem; scroll-margin-top: calc(var(--header-h) + 24px); }
 
 /* ── rendered markdown ──────────────────────────────── */
@@ -577,9 +470,6 @@ a:hover { color: var(--accent-pale); text-decoration: underline; }
 }
 
 @media (max-width: 720px) {
-  .site-header { gap: 12px; padding: 0 16px; height: 56px; }
-  .site-nav { display: none; }
-  .search-pill .search-text, .search-pill kbd { display: none; }
   .doc-wrap { padding: 22px 20px 48px; }
   .doc-title { font-size: 2rem; }
   .doc-lede { font-size: 1rem; }
@@ -588,128 +478,6 @@ a:hover { color: var(--accent-pale); text-decoration: underline; }
   .doc-footer { grid-template-columns: minmax(0, 1fr); }
   .foot-card.next { grid-column: 1; text-align: left; }
 }
-
-/* ── tooltip ────────────────────────────────────────── */
-/* Same rules as the settings core's header tooltips, so both surfaces match. */
-[data-tooltip] {
-  position: relative;
-}
-
-[data-tooltip]::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%) translateY(-4px);
-  padding: 5px 9px;
-  border-radius: 6px;
-  background: #000;
-  border: 1px solid #2f2f2f;
-  color: #e6e6e6;
-  font-size: 0.74rem;
-  font-weight: 500;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.18s ease, transform 0.18s ease;
-  z-index: 30;
-}
-
-[data-tooltip]:hover::after,
-[data-tooltip]:focus-visible::after {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
-/* Nav tooltips clear the accent line, which sits 22px below the label. */
-.nav-link[data-tooltip]::after { top: calc(100% + 30px); }
-.nav-link.is-soon { cursor: default; }
-.nav-link.is-soon:hover { color: var(--muted); }
-
-/* ── filled brand marks ─────────────────────────────── */
-.hdr-icon.is-filled { stroke: none; fill: var(--muted); }
-.hdr-icon.is-filled:hover { stroke: none; fill: var(--ink); }
-
-/* ── help button ────────────────────────────────────── */
-.help-wrap { position: relative; }
-
-.help-pill {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  height: 34px;
-  padding: 0 14px;
-  border: none;
-  border-radius: 999px;
-  background: #5865f2;
-  font-family: inherit;
-  font-size: 0.84rem;
-  font-weight: 600;
-  color: #fff;
-  cursor: pointer;
-  transition: filter 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-}
-.help-pill:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(88, 101, 242, 0.35);
-}
-
-.help-pop {
-  position: absolute;
-  top: calc(100% + 12px);
-  right: 0;
-  width: 276px;
-  padding: 16px;
-  border: 1px solid var(--line-mid);
-  border-radius: 12px;
-  background: var(--raised-2);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-6px);
-  transition: opacity 0.18s ease, transform 0.18s ease;
-  z-index: 60;
-}
-/* Bridges the gap so the popover survives the pointer crossing it. */
-.help-pop::before {
-  content: '';
-  position: absolute;
-  top: -12px;
-  left: 0;
-  right: 0;
-  height: 12px;
-}
-.help-wrap:hover .help-pop,
-.help-wrap:focus-within .help-pop {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
-}
-
-.help-pop h4 {
-  margin: 0 0 6px;
-  font-family: var(--display);
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-.help-pop p { margin: 0 0 14px; font-size: 0.84rem; line-height: 1.55; color: var(--soft); }
-
-.help-cta {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  height: 40px;
-  border-radius: 8px;
-  background: #5865f2;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #fff;
-  transition: filter 0.2s ease;
-}
-.help-cta:hover { filter: brightness(1.1); color: #fff; text-decoration: none; }
 
 /* ── image lightbox ─────────────────────────────────── */
 .doc-body img { cursor: zoom-in; }
@@ -763,7 +531,5 @@ a:hover { color: var(--accent-pale); text-decoration: underline; }
 .lightbox-close:hover { background: #232323; border-color: var(--line-hard); }
 
 @media (max-width: 720px) {
-  .help-pill span { display: none; }
-  .help-pill { padding: 0 11px; }
   .lightbox { padding: 64px 16px 16px; }
 }

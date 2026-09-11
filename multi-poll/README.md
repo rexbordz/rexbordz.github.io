@@ -2,7 +2,7 @@
 ## Requirements
 
 <img src="https://github.com/user-attachments/assets/77ff6913-e6d7-4fe0-b9a0-bf66f5e8f745" style="height: 1em; vertical-align: middle;"> **Streamer.Bot (For Twitch, YouTube, and/or Kick)** <br>
-If you need help setting this up, visit their [website](https://streamer.bot/).
+If you need help setting this up, visit their [website](https://docs.streamer.bot/).
 
 <img src="https://github.com/user-attachments/assets/3ec8eac2-17d2-4a97-a066-e55c1e29d2c5" style="height: 1em; vertical-align: middle;"> **Tikfinity (For TikTok)** <br>
 You need this to be able to listen to TikTok events. If you need help setting this up, you can check out my [Tikfinity Setup Guide](https://www.notion.so/Tikfinity-Setup-Guide-241088f4f93e8051b991c6ef4b659934?pvs=21).
@@ -28,7 +28,7 @@ TikFinity’s WebSocket Server is on by default so there’s nothing else that n
 
 ### 3. Import Streamer.bot Actions
 
-- Copy the [import code](https://github.com/rexbordz/rexbordz.github.io/blob/main/multi-poll/import.sb)
+- Copy the [import code](#import-code)
 - Click `Import` and paste the code into the textbox
 
   <img alt="image" src="https://github.com/user-attachments/assets/a8008849-b776-416b-a945-32d25b36f09c" />

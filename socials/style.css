@@ -1,33 +1,9 @@
 /* Socials page. Palette, type and easings come from ../.shared/css/global.css. */
 
-@property --a { syntax: '<angle>'; inherits: false; initial-value: 0turn; }
-
 body { min-height: 100vh; }
 
-/* ── atmosphere ─────────────────────────────────────── */
-.bg, .spot { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
-.bg {
-  background:
-    radial-gradient(90% 46% at 50% 0, rgba(59, 130, 246, 0.15), transparent 60%),
-    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.05) 1px, transparent 0) 0 0 / 20px 20px;
-}
-.spot {
-  opacity: 0;
-  transition: opacity 0.5s var(--ease);
-  background: radial-gradient(340px circle at var(--mx, 50%) var(--my, 40%),
-    rgba(59, 130, 246, 0.28), rgba(59, 130, 246, 0.09) 44%, transparent 70%);
-}
-/* The same dot grid, brighter and accent-tinted, revealed only where the glow lands.
-   Origin and cell size must match .bg so the lit dots sit exactly on the dim ones. */
-.spot::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 1px 1px, rgba(159, 189, 242, 0.5) 1px, transparent 0) 0 0 / 20px 20px;
-  -webkit-mask: radial-gradient(300px circle at var(--mx, 50%) var(--my, 40%), #000, rgba(0, 0, 0, 0.35) 55%, transparent 72%);
-  mask: radial-gradient(300px circle at var(--mx, 50%) var(--my, 40%), #000, rgba(0, 0, 0, 0.35) 55%, transparent 72%);
-}
-body.is-near .spot { opacity: 1; }
+/* Atmosphere (.bg/.spot, @property --a) now lives in ../.shared/css/atmosphere.css
+   so the homepage can share it. The pointer script below still feeds it. */
 
 .page { position: relative; z-index: 1; max-width: 880px; margin: 0 auto; padding: 64px 24px 72px; }
 @media (max-width: 560px) { .page { padding: 44px 18px 56px; } }
