@@ -10,9 +10,11 @@
   var entry = (C && C.entry(boot.id)) || {};
 
   // Catalog supplies the defaults; anything set inline in the shim still wins.
-  ['eyebrow', 'version', 'lede', 'platforms'].forEach(function (k) {
+  ['eyebrow', 'version', 'platforms'].forEach(function (k) {
     if (boot[k] === undefined && entry[k] !== undefined) boot[k] = entry[k];
   });
+  // The hero paragraph is 'lede' everywhere on the site; the catalog calls it 'description'.
+  if (boot.lede === undefined) boot.lede = entry.description;
   if (boot.title === undefined) boot.title = entry.name || '';
   if (!boot.source && entry.widgetUrl) boot.source = C.root(entry.widgetUrl + 'README.md');
   if (!boot.widgetUrl && entry.widgetUrl) boot.widgetUrl = C.root(entry.widgetUrl);

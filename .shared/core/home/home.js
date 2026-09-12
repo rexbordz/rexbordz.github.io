@@ -79,7 +79,7 @@
           '<span class="tile-name">' + C.esc(c.name) + '</span>' +
           badge(c.tier) +
         '</div>' +
-        '<p>' + C.esc(c.tagline || c.lede || '') + '</p>' +
+        '<p>' + C.esc(c.description || '') + '</p>' +
         '<div class="tile-foot">' + platforms(c.platforms) +
           '<span class="tile-links">' + extra +
             '<a class="tile-go" href="' + C.esc(href) + '">Docs' + C.svg(C.ICON.arrow, { size: 14, stroke: 'currentColor', width: 2.4 }) + '</a>' +

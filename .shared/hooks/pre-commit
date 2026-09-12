@@ -1,0 +1,5 @@
+#!/bin/sh
+# Keeps each docs shim's link-preview tags in step with its catalog entry, so
+# adding a widget stays: copy the shim, change the id, commit.
+node .shared/tools/stamp-meta.mjs || exit 1
+git add -u -- '*/docs/index.html'
