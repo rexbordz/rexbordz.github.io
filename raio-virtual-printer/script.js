@@ -9,6 +9,7 @@ const deviceLocale = navigator.language || 'en-US';
 const userLocale = urlParams.get('dateFormat') || deviceLocale;
 const is24Hour = urlParams.get('timeFormat') === '24';
 const debugMode = urlParams.get('debug') === '1';
+const tikfinityWs = createEmitter();
 
 // Single font-size teller override, e.g. ?fontSize=5vmin or ?fontSize=48px
 const fontSizeOverride = urlParams.get('fontSize');
@@ -33,7 +34,7 @@ const timeFormat = new Intl.DateTimeFormat(userLocale, {
   hour12: !is24Hour
 });
 
-const widgetTitle = 'Receipt Renderer';
+const widgetTitle = 'RAIO Virtual Receipt';
 const notifications = document.querySelector('.notifications');
 const receiptStage = document.getElementById('receiptStage');
 
@@ -80,6 +81,19 @@ sbClient.on('General.Custom', ({ data }) => {
   console.debug(payload);
   handleCommand(payload);
 });
+
+// ------------------------
+// Tikfinity Events
+// ------------------------
+const tiktokGiftActionId = "7b78a1d5-74ad-46bf-833f-f578ff728ac0";
+
+tikfinityWs.on("gift", ({ data }) => {
+    // TikTok streak handling
+    if (data.giftType === 1 && !data.repeatEnd) return;
+    console.debug('📢 New TikTok Gift:', data);
+    sbClient.doAction(tiktokGiftActionId, data);
+});
+
 
 // ------------------------
 // Command handling (the API's entry point)
@@ -405,6 +419,60 @@ function createToast(type, title, text) {
   setTimeout(() => newToast.remove(), 3000);
 }
 
+// =============================
+// Tikfinity Setup
+// =============================
+let tikfinityConnected = false;
+
+function connectTikfinity() {
+  const socket = new WebSocket("ws://localhost:21213");
+
+  socket.onopen = () => {
+    if (!tikfinityConnected) {
+      tikfinityConnected = true;
+      console.log("✅ Connected to TikFinity");
+      createToast('success', widgetTitle, 'Connected to Tikfinity');
+    }
+  };
+
+  socket.onclose = () => {
+    if (tikfinityConnected) {
+      tikfinityConnected = false;
+      console.warn("❌ Disconnected from TikFinity");
+      createToast('warning', widgetTitle, 'Disconnected from Tikfinity');
+    }
+    setTimeout(connectTikfinity, 3000);
+  };
+
+  socket.onerror = (err) => {
+    console.error("TikFinity WebSocket error:", err);
+  };
+
+  socket.onmessage = (event) => {
+    try {
+      const response = JSON.parse(event.data);
+      tikfinityWs.emit(response.event, response.data);
+    } catch (err) {
+      console.error("Failed to process TikFinity event:", err);
+    }
+  };
+}
+
+document.addEventListener("DOMContentLoaded", connectTikfinity);
+
+// Tiny pub/sub used by kickPusher and tikfinityWs
+function createEmitter() {
+  return {
+    listeners: {},
+    on(event, callback) {
+      (this.listeners[event] ??= []).push(callback);
+    },
+    emit(event, data) {
+      (this.listeners[event] || []).forEach(callback => callback({ event, data }));
+    }
+  };
+}
+
 // ------------------------
 // Debug panel (?debug=1 only) -- exercises the exact same API as production
 // ------------------------
@@ -495,7 +563,11 @@ if (debugMode) {
       event: 'GIFT',
       avatar: 'assets/images/profile-picture.png',
       username: 'rexbordz',
-      amount: 'sent Rose x5',
+      description: 'sent Rose x5',
+      amount: {
+        logo: 'assets/images/tiktok-coin.png',  // local file or full https:// URL
+        value: '5 coins'
+      },
       giftCount: 'x5',
       giftImage: 'assets/images/profile-picture.png'
     }

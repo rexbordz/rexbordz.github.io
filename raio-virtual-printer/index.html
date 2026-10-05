@@ -161,11 +161,17 @@
         </div>
         <div class="user-info gifts-receipt">
           <div class="username" data-bind="username"></div>
-          <div class="amount" data-bind="amount"></div>
+          <div class="description-row">
+            <div class="description" data-bind="description"></div>
+            <div class="gift-amount" data-show-if="amount.value">
+              <img class="gift-amount-logo" data-bind="amount.logo" data-show-if="amount.logo" alt="">
+              <span class="gift-amount-value" data-bind="amount.value"></span>
+            </div>
+          </div>
         </div>
         <div class="gift-info">
           <span class="gift-count" data-bind="giftCount"></span>
-          <img class="gift-picture-url" data-bind="giftImage" alt="Gift Image">
+          <img class="gift-picture-url" data-bind="giftImage" data-show-if="giftImage" alt="">
         </div>
       </div>
       <div class="divider hyphen"></div>

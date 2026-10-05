@@ -324,11 +324,49 @@ html, body {
 
 /* TEXT ELLIPSIS LOGIC */
 .user-info.gifts-receipt .username,
-.user-info.gifts-receipt .amount {
+.user-info.gifts-receipt .description {
   white-space: nowrap;      /* Keep text on one line */
   overflow: hidden;         /* Hide the overflow */
   text-overflow: ellipsis;  /* Add the "..." */
   width: 100%;              /* Occupy full width of the parent flex-box */
+}
+
+/* Description + amount badge sit side by side, vertically centered to each other */
+.description-row {
+  display: flex;
+  align-items: center;   /* vertical centering of badge relative to description */
+  gap: 0.35em;
+  min-width: 0;          /* lets the description shrink/ellipsize instead of pushing the badge out */
+}
+
+.user-info.gifts-receipt .description {
+  flex: 0 1 auto;
+  width: auto;           /* override the 100% width so the badge can sit right next to it */
+  min-width: 0;
+}
+
+/* Dark translucent rounded box holding the logo + value */
+.gift-amount {
+  flex: 0 0 auto;        /* never squished; the description gives way first */
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0.1em 0.35em;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  border-radius: 0.3em;
+  font-size: 0.8em;
+  line-height: 1.1;
+}
+
+.gift-amount-logo {
+  height: 0.9em;
+  width: auto;
+  display: block;
+}
+
+.gift-amount-value {
+  white-space: nowrap;
 }
 
 .gift-info .gift-count {
