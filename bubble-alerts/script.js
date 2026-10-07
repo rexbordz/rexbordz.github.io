@@ -472,7 +472,7 @@ async function TwitchEvent(event, data) {
 
     case "Raid":
       if (!twitchRaid) return;
-      username = data.raider.name ??  data.from_broadcaster_user_login;
+      username = data.raider?.name ?? data.from_broadcaster_user_name;
       message = `Raiding with a party of <strong>${data.viewers}</strong>!`;
       break;
 
