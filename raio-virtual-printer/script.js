@@ -85,8 +85,7 @@ sbClient.on('General.Custom', ({ data }) => {
 // ------------------------
 // Tikfinity Events
 // ------------------------
-const tiktokGiftActionId = "7b78a1d5-74ad-46bf-833f-f578ff728ac0";
-
+const tiktokGiftActionId = '7b78a1d5-74ad-46bf-833f-f578ff728ac0';
 tikfinityWs.on("gift", ({ data }) => {
     // TikTok streak handling
     if (data.giftType === 1 && !data.repeatEnd) return;
@@ -94,6 +93,11 @@ tikfinityWs.on("gift", ({ data }) => {
     sbClient.doAction(tiktokGiftActionId, data);
 });
 
+const tiktokSubActionId = 'e52571b3-6521-4f57-840c-d986f2f850bb';
+tikfinityWs.on("subscribe", ({ data }) => {
+    console.debug('📢 New TikTok Subscribe:', data);
+    sbClient.doAction(tiktokSubActionId, data);
+});
 
 // ------------------------
 // Command handling (the API's entry point)
