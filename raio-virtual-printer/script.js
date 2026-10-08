@@ -369,13 +369,23 @@ function sendReceiptToDiscord({ webhookUrl, username, avatarUrl } = {}) {
   const node = currentReceipt.el;
   const scale = 2; // ensures high-resolution output regardless of the on-screen size
 
+  // Full content size, not just the visible (clipped) part
+  const fullWidth  = node.scrollWidth;
+  const fullHeight = node.scrollHeight;
+
   htmlToImage.toBlob(node, {
     cacheBust: true,
     pixelRatio: scale,
+    width: fullWidth,
+    height: fullHeight,
     filter: (n) => !(n.tagName === 'IMG' && !n.getAttribute('src')),
     style: {
-      transform: 'scale(1)',
-      transformOrigin: 'top left'
+      transform: 'none',          // also drops the printFeed translateY
+      animation: 'none',          // don't capture mid-animation
+      transformOrigin: 'top left',
+      maxHeight: 'none',          // remove the page-height cap on the clone
+      height: fullHeight + 'px',
+      overflow: 'visible'         // show all content instead of clipping/scrolling
     }
   })
     .then((blob) => {
