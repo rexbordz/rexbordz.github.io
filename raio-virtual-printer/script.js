@@ -225,7 +225,12 @@ function bindFields(root, data) {
       value === null ||
       value === '' ||
       (Array.isArray(value) && value.length === 0);
-    el.style.display = isEmpty ? 'none' : '';
+
+    if (isEmpty) {
+      el.remove();
+    } else {
+      el.style.display = '';
+    }
   });
 
   root.querySelectorAll('[data-bind]').forEach((el) => {
@@ -367,6 +372,7 @@ function sendReceiptToDiscord({ webhookUrl, username, avatarUrl } = {}) {
   htmlToImage.toBlob(node, {
     cacheBust: true,
     pixelRatio: scale,
+    filter: (n) => !(n.tagName === 'IMG' && !n.getAttribute('src')),
     style: {
       transform: 'scale(1)',
       transformOrigin: 'top left'
