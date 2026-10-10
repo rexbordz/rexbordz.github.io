@@ -391,12 +391,12 @@ function sendReceiptToDiscord({ webhookUrl, username, avatarUrl } = {}) {
     .then((blob) => {
       if (!blob) throw new Error('htmlToImage produced an empty blob');
 
+      // refer to https://docs.discord.com/developers/resources/webhook for payload shape structure
+      const timestamp = Date.now();
       const formData = new FormData();
-      formData.append('file', blob, 'receipt.png');
-      formData.append('payload_json', JSON.stringify({
-        username: username || widgetTitle,
-        avatar_url: avatarUrl || ''
-      }));
+      if (username) formData.append('username', username);
+      if (avatarUrl) formData.append('avatar_url', avatarUrl);
+      formData.append('file', blob, `raio_${timestamp}.png`);
 
       return fetch(url, { method: 'POST', body: formData });
     })
